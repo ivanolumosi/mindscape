@@ -1,0 +1,89 @@
+### Add a New Question
+POST http://localhost:3000/api/assessments/questions
+Content-Type: application/json
+
+{
+  "assessmentTitle": "Mental Health Quiz",
+  "questionText": "where are you going now???",
+  "questionType": "Multiple Choice",
+  "options": "Meditation, Exercise, Talking to a friend, Ignoring it",
+  "isRequired": true
+}
+
+### Delete a Question
+DELETE http://localhost:3000/api/assessments/questions/1
+
+### Get All Questions for an Assessment
+GET http://localhost:3000/api/assessments/questions/Mental%20Health%20Quiz
+
+### Add a New Response
+
+POST http://localhost:3000/api/assessments/responses
+Content-Type: application/json
+
+{
+  "userId": 3,
+  "questionId": 6,
+  "responseText": null,
+  "selectedOption": "Exercise"
+}
+
+### Get All Responses for a User and Assessment
+GET http://localhost:3000/api/assessments/responses/3/Mental%20Health%20Quiz
+
+### Update a Response
+PATCH http://localhost:3000/api/assessments/responses/3
+Content-Type: application/json
+
+{
+  "responseText": "Feeling much better",
+  "selectedOption": null
+}
+
+### Get All Results for an Assessment
+GET http://localhost:3000/api/assessments/results/Mental%20Health%20Quiz
+
+### Get All Results for a Specific User
+GET http://localhost:3000/api/assessments/results/user/3
+
+### Update an Assessment Question
+PATCH http://localhost:3000/api/assessments/questions/1
+Content-Type: application/json
+
+{
+  "assessmentTitle": "Mental Health Quiz",
+  "questionText": "How do you feel most of the time?",
+  "questionType": "Multiple Choice",
+  "options": "Happy, Neutral, Sad",
+  "isRequired": true
+}
+
+### Update an Assessment Result
+PATCH http://localhost:3000/api/assessments/results/1
+Content-Type: application/json
+
+{
+  "score": 85,
+  "feedback": "Good mental well-being",
+  "status": "Completed"
+}
+### Get All Assessments by Title
+GET http://localhost:3000/api/assessments/titles/Mental%20Health
+
+### Get a Question by ID
+GET http://localhost:3000/api/assessments/questions/5
+
+### Get All Questions
+GET http://localhost:3000/api/assessments/questions
+
+### Add a New Result
+POST http://localhost:3000/api/assessments/results
+Content-Type: application/json
+
+{
+  "userId": 3,
+  "assessmentTitle": "Mental Health Quiz",
+  "score": 85,
+  "feedback": "Good performance! Keep it up.",
+  "status": "Completed"
+}

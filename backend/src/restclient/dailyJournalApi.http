@@ -1,0 +1,40 @@
+### 1️⃣ Add a New Journal Entry
+POST http://localhost:3000/api/journal
+Content-Type: application/json
+
+{
+  "userId": 1,
+  "entryDate": "2024-02-25",
+  "mood": "Happy",
+  "reflections": "Had a great day!",
+  "gratitude": "Thankful for my family."
+}
+
+### 2️⃣ Delete a Journal Entry
+DELETE http://localhost:3000/api/journal/2
+
+### 3️⃣ Get a Journal Entry by ID
+GET http://localhost:3000/api/journal/2
+
+### 4️⃣ Get All Journal Entries for a User
+GET http://localhost:3000/api/journal/user/1
+
+### 5️⃣ Get Journal Entries by Date Range
+GET http://localhost:3000/api/journal/user/1/date-range?startDate=2024-02-01&endDate=2024-02-20
+
+### 6️⃣ Get Journal Statistics for a User
+GET http://localhost:3000/api/journal/user/1/stats
+
+### 7️⃣ Update a Journal Entry
+PATCH http://localhost:3000/api/journal/2
+Content-Type: application/json
+
+{
+  "mood": "Excited",
+  "reflections": "Looking forward to my trip!",
+  "gratitude": "Grateful for new opportunities."
+}
+
+### 8️⃣ Get All Journal Entries
+GET http://localhost:3000/api/journal/all
+

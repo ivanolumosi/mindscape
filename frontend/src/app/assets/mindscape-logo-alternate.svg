@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <!-- Circular background -->
+  <circle cx="200" cy="140" r="100" fill="#f8f9fa" />
+  
+  <!-- Head silhouette -->
+  <path d="M200 60 C240 60, 270 90, 280 130 C290 170, 270 210, 240 225 
+           C235 227, 232 235, 230 245 C228 255, 215 260, 200 260
+           C185 260, 172 255, 170 245 C168 235, 165 227, 160 225
+           C130 210, 110 170, 120 130 C130 90, 160 60, 200 60Z" 
+        fill="#f5f5f5" stroke="#4caf50" stroke-width="3" />
+  
+  <!-- Brain tree structure -->
+  <path d="M200 100 C200 110, 200 120, 200 200" 
+        stroke="#555555" stroke-width="4" fill="none" />
+  
+  <!-- Left branches -->
+  <path d="M200 120 C185 115, 170 120, 160 130" 
+        stroke="#555555" stroke-width="3" fill="none" />
+  <path d="M200 140 C180 140, 165 145, 155 155" 
+        stroke="#555555" stroke-width="3" fill="none" />
+  <path d="M200 160 C185 165, 175 175, 170 185" 
+        stroke="#555555" stroke-width="3" fill="none" />
+        
+  <!-- Right branches -->
+  <path d="M200 120 C215 115, 230 120, 240 130" 
+        stroke="#555555" stroke-width="3" fill="none" />
+  <path d="M200 140 C220 140, 235 145, 245 155" 
+        stroke="#555555" stroke-width="3" fill="none" />
+  <path d="M200 160 C215 165, 225 175, 230 185" 
+        stroke="#555555" stroke-width="3" fill="none" />
+  
+  <!-- Leaves - left side -->
+  <path d="M160 130 C155 125, 145 123, 140 128 C135 133, 138 143, 145 145 C150 147, 158 140, 160 130" 
+        fill="#4caf50" stroke="#2e7d32" stroke-width="1" />
+  <path d="M155 155 C150 150, 140 148, 135 153 C130 158, 133 168, 140 170 C145 172, 153 165, 155 155" 
+        fill="#4caf50" stroke="#2e7d32" stroke-width="1" />
+  <path d="M170 185 C165 180, 155 178, 150 183 C145 188, 148 198, 155 200 C160 202, 168 195, 170 185" 
+        fill="#4caf50" stroke="#2e7d32" stroke-width="1" />
+  
+  <!-- Leaves - right side -->
+  <path d="M240 130 C245 125, 255 123, 260 128 C265 133, 262 143, 255 145 C250 147, 242 140, 240 130" 
+        fill="#4caf50" stroke="#2e7d32" stroke-width="1" />
+  <path d="M245 155 C250 150, 260 148, 265 153 C270 158, 267 168, 260 170 C255 172, 247 165, 245 155" 
+        fill="#4caf50" stroke="#2e7d32" stroke-width="1" />
+  <path d="M230 185 C235 180, 245 178, 250 183 C255 188, 252 198, 245 200 C240 202, 232 195, 230 185" 
+        fill="#4caf50" stroke="#2e7d32" stroke-width="1" />
+  
+  <!-- Top leaves -->
+  <path d="M200 100 C205 90, 215 85, 225 90 C235 95, 230 110, 220 115 C210 120, 195 110, 200 100" 
+        fill="#4caf50" stroke="#2e7d32" stroke-width="1" />
+  <path d="M200 100 C195 90, 185 85, 175 90 C165 95, 170 110, 180 115 C190 120, 205 110, 200 100" 
+        fill="#4caf50" stroke="#2e7d32" stroke-width="1" />
+  
+  <!-- Text with subtle shadow -->
+  <text x="201" y="251" font-family="Arial, sans-serif" font-size="28" font-weight="bold" text-anchor="middle" fill="#333333" opacity="0.2">MindScape</text>
+  <text x="200" y="250" font-family="Arial, sans-serif" font-size="28" font-weight="bold" text-anchor="middle" fill="#2e7d32">MindScape</text>
+  
+  <text x="201" y="276" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#333333" opacity="0.2">Mental Health Platform</text>
+  <text x="200" y="275" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#555555">Mental Health Platform</text>
+</svg>

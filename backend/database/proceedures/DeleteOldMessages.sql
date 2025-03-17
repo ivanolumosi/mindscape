@@ -1,0 +1,9 @@
+DROP PROCEDURE IF EXISTS DeleteOldMessages;
+GO
+CREATE PROCEDURE DeleteOldMessages
+AS
+BEGIN
+    DELETE FROM DirectMessages
+    WHERE created_at < DATEADD(HOUR, -36, GETDATE());
+END;
+GO

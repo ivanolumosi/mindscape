@@ -1,0 +1,44 @@
+### ✅ Send a Friend Request (Kelvin to Alice)
+POST http://localhost:3000/api/friends/request
+Content-Type: application/json
+
+{
+  "senderId": 1011,
+  "receiverId": 1012
+}
+
+### ✅ Send a Friend Request (Alice to Kelvin)
+POST http://localhost:3000/api/friends/request
+Content-Type: application/json
+
+{
+  "senderId": 1012,
+  "receiverId": 1011
+}
+
+### ✅ Accept Friend Request (Assume request ID is 5, update if needed)
+PUT http://localhost:3000/api/friends/accept/1
+
+### ✅ Reject Friend Request (Assume request ID is 6, update if needed)
+PUT http://localhost:3000/api/friends/reject/1
+
+### ✅ Remove Friend (Kelvin and Alice)
+DELETE http://localhost:3000/api/friends/remove
+Content-Type: application/json
+
+{
+  "userId": 1011,
+  "friendId": 1012
+}
+
+### ✅ Get Friend List (Kelvin)
+GET http://localhost:3000/api/friends/list/1011
+
+### ✅ Get Friend List (Alice)
+GET http://localhost:3000/api/friends/list/1012
+
+### ✅ Get Incoming Friend Requests (Kelvin)
+GET http://localhost:3000/api/friends/requests/1011
+
+### ✅ Get Incoming Friend Requests (Alice)
+GET http://localhost:3000/api/friends/requests/1012

@@ -1,0 +1,49 @@
+### ✅ Notify User About a Comment on Their Post
+POST http://localhost:3000/api/notifications/notify/comment
+Content-Type: application/json
+
+{
+  "userId": 1012,
+  "commenterId": 1011,
+  "postId": 5
+}
+
+### ✅ Notify User of Successful Sign-In
+POST http://localhost:3000/api/notifications/notify/signin
+Content-Type: application/json
+
+{
+  "userId": 1012
+}
+
+### ✅ Notify When a Friend Request is Sent
+POST http://localhost:3000/api/notifications/notify/friend-request-sent
+Content-Type: application/json
+
+{
+  "senderId": 1011,
+  "receiverId": 1012
+}
+
+### ✅ Notify When a Friend Request is Received
+POST http://localhost:3000/api/notifications/notify/friend-request-received
+Content-Type: application/json
+
+{
+  "receiverId": 1012
+}
+
+### ✅ Notify Users About Available Counselors
+POST http://localhost:3000/api/notifications/notify/available-counselors
+Content-Type: application/json
+
+{}
+
+### ✅ Get All Notifications for a User
+GET http://localhost:3000/api/notifications/user/1012
+
+### ✅ Get Friend Request Notifications for a User
+GET http://localhost:3000/api/notifications/friend-requests/1012
+
+### ✅ Delete a Notification 
+DELETE http://localhost:3000/api/notifications/5

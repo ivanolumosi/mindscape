@@ -1,0 +1,41 @@
+### 🏠 Test API Root
+GET http://localhost:3000/
+### 1️⃣ Add a New Goal
+POST http://localhost:3000/api/goals
+Content-Type: application/json
+
+{
+  "userId": 1,
+  "goalTitle": "Learn TypeScript",
+  "goalDescription": "Complete TypeScript course on Udemy",
+  "goalType": "Weekly",
+  "dueDate": "2025-03-01"
+}
+
+
+### 2️⃣ Delete a Goal
+DELETE http://localhost:3000/api/goals/10
+
+### 3️⃣ Get All Goals for a User
+GET http://localhost:3000/api/goals/user/1
+
+### 4️⃣ Get Goals by Status (Completed)
+GET http://localhost:3000/api/goals/user/1/status?isCompleted=true
+
+### 5️⃣ Get Goals by Status (Not Completed)
+GET http://localhost:3000/api/goals/user/1/status?isCompleted=false
+
+### 6️⃣ Get Goal by ID
+GET http://localhost:3000/api/goals/10
+
+### 7️⃣ Track Goal Progress
+GET http://localhost:3000/api/goals/10/progress
+
+### 8️⃣ Update Goal Status
+PATCH http://localhost:3000/api/goals/10/status
+Content-Type: application/json
+
+{
+  "isCompleted": true,
+  "progressPercentage": 100
+}

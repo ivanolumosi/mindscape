@@ -1,0 +1,10 @@
+-- CREATE TRIGGER trg_NotifyUsersOnCounselorAvailability
+-- ON users
+-- AFTER UPDATE
+-- AS
+-- BEGIN
+--     IF UPDATE(availabilitySchedule)
+--     BEGIN
+--         EXEC NotifyUsersOnAvailableCounselors;
+--     END;
+-- END;

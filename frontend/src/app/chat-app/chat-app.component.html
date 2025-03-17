@@ -1,0 +1,175 @@
+<!-- chat.component.html -->
+<div class="chat-container">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="logo">
+      <img src="assets/images/mindscape-logo.png" alt="Mindscape" class="logo-img">
+      <span class="logo-text">mindscape</span>
+    </div>
+    
+    <div class="search-container">
+      <div class="search-box">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" placeholder="Search for chats or help..." class="search-input">
+      </div>
+    </div>
+    
+    <div class="menu-container">
+      <div class="menu-item active">
+        <i class="fas fa-th-large"></i>
+        <span>Dashboard</span>
+      </div>
+      <div class="menu-item">
+        <i class="fas fa-book"></i>
+        <span>Daily Journal</span>
+      </div>
+      <div class="menu-item selected">
+        <i class="fas fa-comments"></i>
+        <span>Chats</span>
+      </div>
+      <div class="menu-item">
+        <i class="fas fa-flag"></i>
+        <span>Goals</span>
+      </div>
+      <div class="menu-item">
+        <i class="fas fa-chart-line"></i>
+        <span>Mood Tracking</span>
+      </div>
+      <div class="menu-item">
+        <i class="fas fa-user-friends"></i>
+        <span>Friends</span>
+      </div>
+      <div class="menu-item">
+        <i class="fas fa-clipboard-list"></i>
+        <span>Assessments</span>
+      </div>
+      <div class="menu-item">
+        <i class="fas fa-users"></i>
+        <span>Community Posts</span>
+      </div>
+      <div class="menu-item crisis">
+        <i class="fas fa-exclamation-circle"></i>
+        <span>Crisis Support</span>
+      </div>
+    </div>
+    
+    <div class="user-profile">
+      <div class="avatar">
+        <img [src]="currentUser.avatar" alt="User Avatar">
+      </div>
+      <div class="user-info">
+        <div class="user-name">{{currentUser.name}}</div>
+        <div class="user-status">Student</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Chat Content -->
+  <div class="chat-content">
+    <!-- Chat List -->
+    <div class="chat-list">
+      <div class="chat-list-header">
+        <h2>Conversations</h2>
+        <button class="new-chat-btn">
+          <i class="fas fa-plus"></i>
+        </button>
+      </div>
+      
+      <div class="chat-search">
+        <div class="search-box">
+          <i class="fas fa-search search-icon"></i>
+          <input type="text" placeholder="Search conversations..." class="search-input">
+        </div>
+      </div>
+      
+      <div class="chat-contacts">
+        <div *ngFor="let contact of contacts"
+             class="contact-item"
+             [class.active]="selectedContact.id === contact.id"
+             [class.unread]="contact.unreadCount > 0"
+             (click)="selectContact(contact)">
+          <div class="contact-avatar">
+            <img [src]="contact.avatar" alt="Contact Avatar">
+            <span class="status-indicator" [class]="contact.status"></span>
+            <span *ngIf="contact.unreadCount > 0" class="unread-badge">{{contact.unreadCount}}</span>
+          </div>
+          <div class="contact-info">
+            <div class="contact-header">
+              <span class="contact-name">{{contact.name}}</span>
+              <span class="contact-time">{{formatTime(contact.timestamp)}}</span>
+            </div>
+            <div class="contact-message">{{contact.lastMessage}}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Chat Messages -->
+    <div class="chat-messages">
+      <div class="chat-header">
+        <div class="contact-info">
+          <div class="contact-avatar">
+            <img [src]="selectedContact.avatar" alt="Contact Avatar">
+            <span class="status-indicator" [class]="selectedContact.status"></span>
+          </div>
+          <div class="contact-details">
+            <div class="contact-name">{{selectedContact.name}}</div>
+            <div class="contact-status">{{selectedContact.status}}</div>
+          </div>
+        </div>
+        <div class="chat-actions">
+          <button class="action-btn"><i class="fas fa-phone"></i></button>
+          <button class="action-btn"><i class="fas fa-video"></i></button>
+          <button class="action-btn"><i class="fas fa-info-circle"></i></button>
+        </div>
+      </div>
+      
+      <div class="message-container">
+        <div *ngFor="let message of messages; let i = index; let isFirst = first">
+          <!-- Date separator -->
+          <div *ngIf="isFirst || formatDate(messages[i-1].timestamp) !== formatDate(message.timestamp)" class="date-separator">
+            <span>{{formatDate(message.timestamp)}}</span>
+          </div>
+          
+          <div class="message" [class.own-message]="message.isOwnMessage">
+            <div class="message-avatar" *ngIf="!message.isOwnMessage">
+              <img [src]="selectedContact.avatar" alt="Avatar">
+            </div>
+            <div class="message-content">
+              <div class="message-bubble">
+                <div class="message-text">{{message.content}}</div>
+              </div>
+              <div class="message-info">
+                <span class="message-time">{{formatTime(message.timestamp)}}</span>
+                <span *ngIf="message.isOwnMessage" class="message-status">
+                  <i class="fas" [class.fa-check-double]="message.isRead" [class.fa-check]="!message.isRead"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="message-composer">
+        <button class="composer-btn"><i class="fas fa-paperclip"></i></button>
+        <div class="composer-input-container">
+          <input type="text" 
+                class="composer-input" 
+                placeholder="Type a message..." 
+                [(ngModel)]="newMessage" 
+                (keyup.enter)="sendMessage()">
+          <button class="emoji-btn" (click)="toggleEmojiPicker()">
+            <i class="far fa-smile"></i>
+          </button>
+          <!-- Emoji picker would be implemented here -->
+          <div *ngIf="showEmojiPicker" class="emoji-picker">
+            <!-- Emoji content would go here -->
+          </div>
+        </div>
+        <button class="send-btn" [disabled]="!newMessage.trim()" (click)="sendMessage()">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

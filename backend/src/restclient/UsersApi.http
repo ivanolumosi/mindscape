@@ -1,0 +1,88 @@
+### 🏠 Test API Root
+GET http://localhost:3000/
+
+### 📝 Register a New User (Seeker)
+POST http://localhost:3000/api/users/register
+Content-Type: application/json
+
+{
+    "name": "Alice Wanja",
+    "email": "alice.wanja@example.com",
+    "password": "securepassword",
+    "role": "seeker",
+    "faculty": "Mental Health"
+}
+
+### 📝 Register a New User (Counselor)
+POST http://localhost:3000/api/users/register
+Content-Type: application/json
+
+{
+    "name": "Qalicha Najma",
+    "email": "qalicha.najma@example.com",
+    "password": "securepassword",
+    "role": "counselor",
+    "profileImage": "https://example.com/profile-qalicha.jpg",
+    "specialization": "Trauma Counseling",
+    "availabilitySchedule": "Tuesday-Sunday 11AM-7PM"
+}
+### 📝 Register a New User (Admin)
+POST http://localhost:3000/api/users/register
+Content-Type: application/json
+
+{
+    "name": "Admin User",
+    "email": "admin@example.com",
+    "password": "adminpass",
+    "role": "admin",
+    "privileges": "manage_users,view_reports"
+}
+
+### 🔍 Get All Users
+GET http://localhost:3000/api/users
+
+### 🔍 Get User by ID
+GET http://localhost:3000/api/users/1
+
+### 🎓 Get Seekers by Faculty
+GET http://localhost:3000/api/users/faculty/Computer%20Science
+
+### 🎭 Get Users by Role
+GET http://localhost:3000/api/users/role/seeker
+
+### 🔄 Update a User
+PUT http://localhost:3000/api/users/1
+Content-Type: application/json
+
+{
+    "name": "Updated Name",
+    "email": "updated.email@example.com",
+    "faculty": "New Faculty"
+}
+
+### 🗑 Delete a User
+DELETE http://localhost:3000/api/users/1
+
+
+
+
+
+
+
+
+
+
+
+
+
+### Register a New User (Seeker)
+POST http://localhost:3000/api/users/register
+Content-Type: application/json
+
+{
+    "name": "Charity Nyawira",
+    "email": "charitynyawira@gmail.com",
+    "password": "SecurePassword123",
+    "role": "seeker",
+    "faculty": "Psychology"
+}

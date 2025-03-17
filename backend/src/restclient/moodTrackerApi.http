@@ -1,0 +1,33 @@
+### 1️⃣ Add a New Mood Entry
+POST http://localhost:3000/api/moods
+Content-Type: application/json
+
+{
+  "userId": 1,
+  "mood": "Happy",
+  "notes": "Feeling great today!"
+}
+
+### 2️⃣ Delete a Mood Entry
+DELETE http://localhost:3000/api/moods/2
+
+### 3️⃣ Get All Mood Entries for a Specific User
+GET http://localhost:3000/api/moods/user/1
+
+### 4️⃣ Get All Mood Entries (All Users)
+GET http://localhost:3000/api/moods/all
+
+### 5️⃣ Get Mood Entries by Date Range
+GET http://localhost:3000/api/moods/user/1/date-range?startDate=2024-02-01&endDate=2024-02-20
+
+### 6️⃣ Get Mood Statistics for a User
+GET http://localhost:3000/api/moods/user/1/stats
+
+### 7️⃣ Update a Mood Entry
+PATCH http://localhost:3000/api/moods/2
+Content-Type: application/json
+
+{
+  "mood": "Excited",
+  "notes": "Looking forward to my trip!"
+}

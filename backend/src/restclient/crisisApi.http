@@ -1,0 +1,132 @@
+### ✅ Report a New Crisis
+POST http://localhost:3000/api/crisis/report
+Content-Type: application/json
+
+{
+  "seekerId": 1,
+  "crisisType": "Depression",
+  "description": "Feeling extremely low and hopeless",
+  "priority": 3
+}
+
+### ✅ Assign a Counselor to a Crisis
+PUT http://localhost:3000/api/crisis/assign
+Content-Type: application/json
+
+{
+  "crisisId": 1,
+  "counselorId": 2
+}
+
+### ✅ Update Crisis Status
+PUT http://localhost:3000/api/crisis/status
+Content-Type: application/json
+
+{
+  "crisisId": 1,
+  "status": "Resolved",
+  "resolvedAt": "2025-02-23T12:00:00Z"
+}
+
+### ✅ Delete a Crisis
+DELETE http://localhost:3000/api/crisis/1
+
+### ✅ Log a Crisis Call
+POST http://localhost:3000/api/crisis/calls
+Content-Type: application/json
+
+{
+  "crisisId": 1,
+  "callerId": 2,
+  "callStart": "2025-02-23T10:30:00Z",
+  "callType": "Phone"
+}
+
+### ✅ Delete a Crisis Call
+DELETE http://localhost:3000/api/crisis/calls/1
+
+### ✅ Log a Crisis Chat Message
+POST http://localhost:3000/api/crisis/chats
+Content-Type: application/json
+
+{
+  "crisisId": 1,
+  "senderId": 2,
+  "message": "I am here to help you."
+}
+
+### ✅ Delete a Crisis Chat Message
+DELETE http://localhost:3000/api/crisis/chats/1
+
+
+# ### ✅ Assign a Counselor to a Crisis
+# PUT http://localhost:3000/api/crisis/assign
+# Content-Type: application/json
+
+# {
+#   "crisisId": 1,
+#   "counselorId": 2
+# }
+
+### ✅ Change Crisis Status
+PUT http://localhost:3000/api/crisis/status
+Content-Type: application/json
+
+{
+  "crisisId": 1,
+  "status": "Resolved",
+  "resolvedAt": "2025-02-25T12:30:00Z"
+}
+
+### ✅ Get All Crisis Calls for a Specific User
+GET http://localhost:3000/api/crisis/calls/user/1
+
+### ✅ Get All Crisis Chats by a Specific User
+GET http://localhost:3000/api/crisis/chats/user/2
+
+### ✅ Get All Crisis Calls in the System
+GET http://localhost:3000/api/crisis/calls
+
+### ✅ Get All Crisis Chats in the System
+GET http://localhost:3000/api/crisis/chats
+
+### ✅ Report a New Crisis
+POST http://localhost:3000/api/crisis/report
+Content-Type: application/json
+
+{
+  "seekerId": 3,
+  "crisisType": "Panic Attack",
+  "description": "Experiencing a severe panic attack",
+  "priority": 2
+}
+
+### ✅ Log a Crisis Call
+POST http://localhost:3000/api/crisis/calls
+Content-Type: application/json
+
+{
+  "crisisId": 1,
+  "callerId": 3,
+  "callStart": "2025-02-25T14:00:00Z",
+  "callType": "Video"
+}
+
+### ✅ Delete a Crisis Call
+DELETE http://localhost:3000/api/crisis/calls/1
+
+### ✅ Log a Crisis Chat Message
+POST http://localhost:3000/api/crisis/chats
+Content-Type: application/json
+
+{
+  "crisisId": 1,
+  "senderId": 3,
+  "message": "I'm here to help, how are you feeling?"
+}
+
+### ✅ Delete a Crisis Chat Message
+DELETE http://localhost:3000/api/crisis/chats/1
+
+### ✅ Delete a Crisis
+DELETE http://localhost:3000/api/crisis/1

@@ -1,0 +1,87 @@
+### ✅ Create a New Post
+POST http://localhost:3000/api/chat/posts
+Content-Type: application/json
+
+{
+  "userId": 1,
+  "content": "This is my first post!"
+}
+
+### ✅ Get All Posts
+GET http://localhost:3000/api/chat/posts
+
+### ✅ Update a Post
+PUT http://localhost:3000/api/chat/posts
+Content-Type: application/json
+
+{
+  "postId": 1,
+  "content": "Updated post content."
+}
+
+### ✅ Add a Comment to a Post
+POST http://localhost:3000/api/chat/comments
+Content-Type: application/json
+
+{
+  "postId": 1,
+  "userId": 2,
+  "content": "Nice post!"
+}
+
+### ✅ Get Comments for a Post
+GET http://localhost:3000/api/chat/comments/1
+
+### ✅ Update a Comment
+PUT http://localhost:3000/api/chat/comments
+Content-Type: application/json
+
+{
+  "commentId": 1,
+  "content": "Updated comment text."
+}
+
+### ✅ Send a Direct Message
+POST http://localhost:3000/api/chat/messages
+Content-Type: application/json
+
+{
+  "senderId": 1,
+  "receiverId": 2,
+  "content": "am good ?"
+}
+
+### ✅ Reply to a Direct Message
+POST http://localhost:3000/api/chat/messages/reply
+Content-Type: application/json
+
+{
+  "senderId": 2,
+  "receiverId": 1,
+  "content": "I'm doing well! How about you?",
+  "parentMessageId": 1
+}
+
+### ✅ Get Unread Messages for a User
+GET http://localhost:3000/api/chat/messages/unread/2
+
+### ✅ Mark a Message as Read
+PATCH http://localhost:3000/api/chat/messages/read/1
+
+### ✅ Get Conversation Between Two Users
+GET http://localhost:3000/api/chat/messages/1/2
+
+
+
+
+### ✅ Delete a Post
+DELETE http://localhost:3000/api/chat/posts/1
+
+### ✅ Delete a Comment
+DELETE http://localhost:3000/api/chat/comments/1
+
+### ✅ Delete Messages Between Two Users
+DELETE http://localhost:3000/api/chat/messages/1/2
+
+### ✅ Delete Old Messages (Older than 36 Hours)
+DELETE http://localhost:3000/api/chat/messages/old
