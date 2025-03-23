@@ -1,11 +1,13 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { Title, Meta } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [],
+  imports: [CommonModule,FormsModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
@@ -149,7 +151,7 @@ export class HomeComponent implements OnInit {
    */
   getStarted(): void { 
     console.log('Get started clicked');
-    // this.router.navigate(['/get-started']);
+    this.router.navigate(['login']);
   }
 
   /**
@@ -157,6 +159,11 @@ export class HomeComponent implements OnInit {
    */
   login(): void {
     console.log('Login clicked');
-    // this.router.navigate(['/login']);
+    this.router.navigate(['login']);
+  }
+  isMenuOpen = false; 
+
+  toggleMenu(): void {
+    this.isMenuOpen = !this.isMenuOpen; 
   }
 }

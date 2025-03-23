@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { SidebarComponent } from "../sidebar/sidebar.component";
 interface JournalEntry {
   id?: string;
   title: string;
@@ -13,7 +14,7 @@ interface JournalEntry {
 @Component({
   selector: 'app-journal',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, SidebarComponent],
   templateUrl: './journal.component.html',
   styleUrl: './journal.component.css'
 })

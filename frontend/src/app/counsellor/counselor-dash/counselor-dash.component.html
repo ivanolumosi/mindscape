@@ -1,1 +1,179 @@
-<p>counselor-dash works!</p>
+<!-- counsellor.component.html -->
+<div class="mindscape-container">
+    <!-- Header -->
+    <header class="mindscape-header">
+      <div class="logo">
+        <img src="assets/images/mindscape-logo.png" alt="Mindscape">
+        <span class="logo-text">mindscape</span>
+      </div>
+      <div class="search-bar">
+        <i class="search-icon">🔍</i>
+        <input type="text" placeholder="Search for resources, friends, or help...">
+      </div>
+      <div class="header-actions">
+        <div class="notification-icon">
+          <i class="bell-icon">🔔</i>
+          <span class="badge">{{notificationCount}}</span>
+        </div>
+        <div class="message-icon">
+          <i class="message-icon">💬</i>
+          <span class="badge">{{messageCount}}</span>
+        </div>
+        <div class="user-profile">
+          <img src="assets/images/counsellor-profile.png" alt="Profile">
+          <span>{{counsellorName}} ▼</span>
+        </div>
+      </div>
+    </header>
+  
+    <div class="main-content">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="user-avatar">
+          <img src="assets/images/counsellor-avatar.png" alt="User Avatar">
+          <div class="user-info">
+            <h3>{{counsellorName}}</h3>
+            <p>Counsellor</p>
+          </div>
+        </div>
+  
+        <nav class="sidebar-nav">
+          <ul>
+            <li class="active">
+              <i class="dashboard-icon">📊</i>
+              <span>Dashboard</span>
+            </li>
+            <li>
+              <i class="journal-icon">📓</i>
+              <span>Patient Journal</span>
+            </li>
+            <li>
+              <i class="chats-icon">💬</i>
+              <span>Chats</span>
+            </li>
+            <li>
+              <i class="goals-icon">🎯</i>
+              <span>Patient Goals</span>
+            </li>
+            <li>
+              <i class="mood-icon">📈</i>
+              <span>Mood Tracking</span>
+            </li>
+            <li>
+              <i class="patients-icon">👥</i>
+              <span>Patients</span>
+            </li>
+            <li>
+              <i class="assessments-icon">📝</i>
+              <span>Assessments</span>
+            </li>
+            <li>
+              <i class="community-icon">🌐</i>
+              <span>Community Posts</span>
+            </li>
+            <li class="crisis-support">
+              <i class="crisis-icon">⚠️</i>
+              <span>Crisis Support</span>
+            </li>
+          </ul>
+        </nav>
+      </aside>
+  
+      <!-- Main content area -->
+      <main class="content">
+        <h1 class="welcome-heading">Welcome back, Dr. Williams!</h1>
+        <p class="date">{{currentDate}}</p>
+  
+        <div class="dashboard-grid">
+          <!-- Patient mood tracking section -->
+          <section class="mood-tracking card">
+            <h2>Patient Mood Overview</h2>
+            <div class="mood-options">
+              <div *ngFor="let mood of moodTracking.options" 
+                   class="mood-option" 
+                   [ngStyle]="{'background-color': mood.color}"
+                   (click)="selectMood(mood.value)">
+                <div class="mood-icon">≡</div>
+                <span>{{mood.value}}</span>
+              </div>
+            </div>
+            <button class="mood-submit-button" (click)="recordMood()">View Mood Trends</button>
+          </section>
+  
+          <!-- Inspiration quote section -->
+          <section class="inspiration card">
+            <h2>Today's Inspiration</h2>
+            <blockquote>
+              "{{todaysQuote.quote}}"
+              <footer>— {{todaysQuote.author}}</footer>
+            </blockquote>
+            <button class="quote-button" (click)="getAnotherQuote()">Get Another Quote</button>
+          </section>
+  
+          <!-- Crisis management section -->
+          <section class="crisis-help card">
+            <h2>Patient Crisis Management</h2>
+            <div class="crisis-actions">
+              <div class="crisis-chat">
+                <div class="crisis-icon">📱</div>
+                <span>Crisis Chat</span>
+              </div>
+              <div class="crisis-call">
+                <div class="crisis-icon">📞</div>
+                <span>Crisis Call</span>
+              </div>
+            </div>
+            <p class="crisis-note">Our trained counselors are available 24/7 for urgent support.</p>
+          </section>
+  
+          <!-- Upcoming sessions section -->
+          <section class="upcoming-sessions card">
+            <div class="section-header">
+              <h2>Upcoming Sessions</h2>
+              <button class="view-all" (click)="viewAllSessions()">View All</button>
+            </div>
+            <div class="session-list">
+              <div class="session-item" *ngFor="let session of upcomingSessions">
+                <img [src]="session.image" [alt]="session.title">
+                <div class="session-details">
+                  <h3>{{session.title}}</h3>
+                  <p>{{session.date}} • {{session.timeStart}} - {{session.timeEnd}}</p>
+                </div>
+                <button class="session-action" (click)="joinSession(session.id)">Join</button>
+              </div>
+            </div>
+          </section>
+  
+          <!-- Patient progress section -->
+          <section class="goals-progress card">
+            <div class="section-header">
+              <h2>Patient Progress</h2>
+              <button class="view-all" (click)="viewAllGoals()">View All</button>
+            </div>
+            <div class="progress-list">
+              <div class="progress-item" *ngFor="let item of patientProgress">
+                <div class="progress-info">
+                  <h3>{{item.name}}</h3>
+                  <div class="progress-bar">
+                    <div class="progress-fill" [style.width.%]="item.progress"></div>
+                  </div>
+                </div>
+                <span class="progress-status">{{item.status}}</span>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+  
+    <!-- Footer -->
+    <footer class="mindscape-footer">
+      <div class="footer-links">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Help Center</a>
+        <a href="#">Contact Support</a>
+      </div>
+      <div class="copyright">© 2025 Mindscape. All rights reserved.</div>
+    </footer>
+  </div>

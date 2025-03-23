@@ -1,5 +1,7 @@
+import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -10,4 +12,16 @@ import { RouterOutlet } from '@angular/router';
 })
 export class AppComponent {
   title = 'frontend';
+
+  showSidebar = true;
+
+  constructor(private router: Router) {
+    this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        // Hide sidebar on login page
+        this.showSidebar = event.url !== '/login';
+      }
+    });
+  }
 }
+

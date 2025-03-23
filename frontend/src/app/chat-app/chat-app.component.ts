@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, Pipe, PipeTransform } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { SidebarComponent } from '../sidebar/sidebar.component';
 
 interface Message {
   id: number;
@@ -25,7 +26,7 @@ interface ChatContact {
 @Component({
   selector: 'app-chat-app',
   standalone: true,
-  imports: [CommonModule,FormsModule],
+  imports: [CommonModule,FormsModule,SidebarComponent],
   templateUrl: './chat-app.component.html',
   styleUrl: './chat-app.component.css'
 })

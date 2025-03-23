@@ -1,1 +1,172 @@
-<p>goals works!</p>
+<div class="app-container">
+  <app-sidebar></app-sidebar>
+  
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="header-content">
+          <h1>Goals</h1>
+          <p>Saturday, March 15, 2025</p>
+        </div>
+        <div class="search-container">
+          <input type="text" placeholder="Search for resources, friends, or help...">
+          <button class="search-button"><i class="fas fa-search"></i></button>
+        </div>
+        <div class="user-menu">
+          <div class="notifications">
+            <i class="fas fa-bell"></i>
+            <span class="badge">3</span>
+          </div>
+          <div class="messages">
+            <i class="fas fa-envelope"></i>
+            <span class="badge">2</span>
+          </div>
+          <div class="user-profile-mini">
+            <img src="assets/images/user-avatar.png" alt="John Doe">
+            <span>John Doe</span>
+            <i class="fas fa-chevron-down"></i>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Goals Content -->
+      <div class="goals-container">
+        <!-- Goals Summary and Add Button -->
+        <div class="goals-header">
+          <div class="goals-summary">
+            <h2>Your Goals Journey</h2>
+            <p>Track your progress and achieve your mental wellness targets</p>
+          </div>
+          <button class="add-goal-btn" (click)="toggleAddGoalForm()">
+            <i class="fas fa-plus"></i> Add New Goal
+          </button>
+        </div>
+  
+        <!-- Goal Categories -->
+        <div class="goal-categories">
+          <div class="category-pills">
+            <button 
+              class="category-pill" 
+              [ngClass]="{'active': selectedCategory === 'All'}" 
+              (click)="filterByCategory('All')"
+            >
+              All
+            </button>
+            <button 
+              *ngFor="let category of categories" 
+              class="category-pill" 
+              [ngClass]="{'active': selectedCategory === category}"
+              (click)="filterByCategory(category)"
+            >
+              {{category}}
+            </button>
+          </div>
+        </div>
+  
+        <!-- Add Goal Form (Hidden by default) -->
+        <div class="add-goal-form" *ngIf="showAddGoalForm">
+          <h3>Create New Goal</h3>
+          <div class="form-group">
+            <label for="goal-title">Title</label>
+            <input type="text" id="goal-title" [(ngModel)]="newGoal.title" placeholder="Enter goal title">
+          </div>
+          <div class="form-group">
+            <label for="goal-description">Description</label>
+            <textarea id="goal-description" [(ngModel)]="newGoal.description" placeholder="Describe your goal"></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group half">
+              <label for="goal-category">Category</label>
+              <select id="goal-category" [(ngModel)]="newGoal.category">
+                <option *ngFor="let category of categories" [value]="category">{{category}}</option>
+              </select>
+            </div>
+            <div class="form-group half">
+              <label for="goal-priority">Priority</label>
+              <select id="goal-priority" [(ngModel)]="newGoal.priority">
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="goal-due-date">Due Date</label>
+            <input type="date" id="goal-due-date" [(ngModel)]="newGoal.dueDate">
+          </div>
+          <div class="form-actions">
+            <button class="cancel-btn" (click)="toggleAddGoalForm()">Cancel</button>
+            <button class="save-btn" (click)="saveNewGoal()">Save Goal</button>
+          </div>
+        </div>
+  
+        <!-- Goals List -->
+        <div class="goals-list">
+          <div class="goal-card" *ngFor="let goal of getFilteredGoals()">
+            <div class="goal-header">
+              <div class="goal-title-area">
+                <h3>{{goal.title}}</h3>
+                <span class="priority-badge" [ngClass]="'priority-' + goal.priority.toLowerCase()">
+                  {{goal.priority}}
+                </span>
+              </div>
+              <div class="goal-actions">
+                <button class="edit-btn"><i class="fas fa-edit"></i></button>
+                <button class="delete-btn" (click)="deleteGoal(goal.id)"><i class="fas fa-trash"></i></button>
+              </div>
+            </div>
+            
+            <div class="goal-body">
+              <p class="goal-description">{{goal.description}}</p>
+              <div class="goal-meta">
+                <span class="goal-category">{{goal.category}}</span>
+                <span class="goal-due-date">Due: {{goal.dueDate | date:'MMM d, y'}}</span>
+              </div>
+              <div class="goal-progress">
+                <div class="progress-label">
+                  <span>Progress: {{goal.progress}}%</span>
+                  <span *ngIf="goal.isCompleted" class="completed-badge">Completed</span>
+                </div>
+                <div class="progress-bar-container">
+                  <div class="progress-bar" [style.width.%]="goal.progress"></div>
+                </div>
+              </div>
+              <div class="progress-controls">
+                <button class="progress-btn" (click)="updateGoalProgress(goal, goal.progress - 10)" [disabled]="goal.progress <= 0">-</button>
+                <input type="range" min="0" max="100" step="10" [(ngModel)]="goal.progress" (change)="updateGoalProgress(goal, goal.progress)">
+                <button class="progress-btn" (click)="updateGoalProgress(goal, goal.progress + 10)" [disabled]="goal.progress >= 100">+</button>
+              </div>
+            </div>
+          </div>
+  
+          <!-- Empty state when no goals match filter -->
+          <div class="empty-state" *ngIf="getFilteredGoals().length === 0">
+            <img src="assets/images/empty-goals.svg" alt="No goals found">
+            <h3>No goals found</h3>
+            <p>You don't have any goals in this category yet. Click the "Add New Goal" button to create one.</p>
+          </div>
+        </div>
+        
+        <!-- Goals Stats -->
+        <div class="goals-stats">
+          <div class="stats-card">
+            <div class="stat-value">{{goals.length}}</div>
+            <div class="stat-label">Total Goals</div>
+          </div>
+          <div class="stats-card">
+            <!-- <div class="stat-value">{{goals.filter(g => g.isCompleted).length}}</div> -->
+            <div class="stat-label">Completed</div>
+          </div>
+          <div class="stats-card">
+            <!-- <div class="stat-value">{{goals.filter(g => !g.isCompleted && new Date(g.dueDate) < new Date()).length}}</div> -->
+            <div class="stat-label">Overdue</div>
+          </div>
+          <div class="stats-card">
+            <!-- <div class="stat-value">{{goals.filter(g => g.priority === 'High' && !g.isCompleted).length}}</div> -->
+            <div class="stat-label">High Priority</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
