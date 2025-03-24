@@ -1,1 +1,66 @@
-<p>assessment works!</p>
+<div class="assessment-page-container">
+    <!-- Sidebar -->
+    <app-sidebar></app-sidebar>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <h1>Assessments</h1>
+            <div class="date">{{ currentDate }}</div>
+        </div>
+
+        <!-- Assessment Selection -->
+        <div class="assessment-selector">
+            <label for="assessment">Choose an assessment:</label>
+            <select id="assessment" [(ngModel)]="selectedAssessment" (change)="loadQuestions()">
+                <option *ngFor="let assessment of mockAssessments" [value]="assessment.title">
+                    {{ assessment.title }}
+                </option>
+            </select>
+        </div>
+
+        <!-- Questions List -->
+        <div class="questions-list">
+            <h2>Questions</h2>
+            <div class="question-card" *ngFor="let question of questions">
+                <p>{{ question.text }}</p>
+                <button class="btn-delete" (click)="deleteQuestion(question.id)">Delete</button>
+            </div>
+            <div class="no-questions" *ngIf="questions.length === 0">
+                <p>No questions available.</p>
+            </div>
+
+            <!-- Add Question Form -->
+            <div class="add-question-form">
+                <input type="text" [(ngModel)]="newQuestion" placeholder="Enter a new question..." />
+                <button class="btn-save" (click)="addQuestion()">Add Question</button>
+            </div>
+        </div>
+
+        <!-- Responses Section -->
+        <div class="responses-section">
+            <h2>Your Responses</h2>
+            <div class="response-card" *ngFor="let response of responses">
+                <p><strong>Q:</strong> {{ response.question }}</p>
+                <p><strong>Your Answer:</strong> {{ response.answer }}</p>
+                <button class="btn-edit" (click)="editResponse(response.id)">Edit</button>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="assessment-results">
+            <h2>Assessment Results</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">{{ results.score }}/100</div>
+                    <div class="stat-label">Score</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">{{ results.rank }}</div>
+                    <div class="stat-label">Rank</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

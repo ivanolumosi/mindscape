@@ -1,0 +1,92 @@
+.friends-container {
+    display: flex;
+    height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.friends-content {
+    flex: 1;
+    padding: 30px;
+    background-color: #ffffff;
+}
+
+.friends-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    background-color: #f0f8f4;
+    border-radius: 20px;
+    padding: 8px 12px;
+}
+
+.search-icon {
+    color: #22a670;
+    margin-right: 8px;
+    font-size: 14px;
+}
+
+.search-input {
+    border: none;
+    background: transparent;
+    outline: none;
+    width: 100%;
+    font-size: 14px;
+    color: #666;
+}
+
+.friend-requests, .friends-list, .friend-recommendations {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+}
+
+.request-card, .friend-card, .recommendation-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.user-name {
+    font-weight: 500;
+}
+
+.btn-accept, .btn-add, .btn-message {
+    background-color: #10b981;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.btn-reject, .btn-remove {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.no-requests, .no-friends, .no-recommendations {
+    text-align: center;
+    color: #6b7280;
+    padding: 10px;
+}

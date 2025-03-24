@@ -1,1 +1,65 @@
-<p>friends works!</p>
+<div class="friends-container">
+    <app-sidebar></app-sidebar>
+
+    <div class="friends-content">
+        <!-- Header -->
+        <div class="friends-header">
+            <h1>Friends</h1>
+            <div class="search-box">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" placeholder="Search friends..." class="search-input">
+            </div>
+        </div>
+
+        <!-- Friend Requests -->
+        <div class="friend-requests">
+            <h2>Friend Requests</h2>
+            <div class="request-card" *ngFor="let request of friendRequests">
+                <div class="user-info">
+                    <img [src]="request.avatar" alt="User Avatar" class="avatar">
+                    <span class="user-name">{{ request.name }}</span>
+                </div>
+                <div class="request-actions">
+                    <button class="btn-accept" (click)="acceptFriendRequest(request.id)">Accept</button>
+                    <button class="btn-reject" (click)="rejectFriendRequest(request.id)">Reject</button>
+                </div>
+            </div>
+            <div *ngIf="friendRequests.length === 0" class="no-requests">
+                No incoming friend requests.
+            </div>
+        </div>
+
+        <!-- Friend List -->
+        <div class="friends-list">
+            <h2>Your Friends</h2>
+            <div class="friend-card" *ngFor="let friend of friends">
+                <div class="user-info">
+                    <img [src]="friend.avatar" alt="User Avatar" class="avatar">
+                    <span class="user-name">{{ friend.name }}</span>
+                </div>
+                <div class="friend-actions">
+                    <button class="btn-message" (click)="openChat(friend)">Message</button>
+                    <button class="btn-remove" (click)="removeFriend(friend.id)">Remove</button>
+                </div>
+            </div>
+            <div *ngIf="friends.length === 0" class="no-friends">
+                You have no friends yet. Start connecting!
+            </div>
+        </div>
+
+        <!-- Friend Recommendations -->
+        <div class="friend-recommendations">
+            <h2>People You May Know</h2>
+            <div class="recommendation-card" *ngFor="let user of recommendedUsers">
+                <div class="user-info">
+                    <img [src]="user.avatar" alt="User Avatar" class="avatar">
+                    <span class="user-name">{{ user.name }}</span>
+                </div>
+                <button class="btn-add" (click)="sendFriendRequest(user.id)">Add Friend</button>
+            </div>
+            <div *ngIf="recommendedUsers.length === 0" class="no-recommendations">
+                No recommendations at the moment.
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,58 @@
+<div class="crisis-support-container">
+
+  <app-sidebar></app-sidebar>
+    <h2 class="section-title">Crisis Support</h2>
+    
+    <div class="crisis-options-grid">
+      <div *ngFor="let option of crisisOptions" class="crisis-option-card">
+        <div class="crisis-option-icon">
+          <div class="icon-placeholder"></div>
+        </div>
+        <div class="crisis-option-details">
+          <h3>{{ option.title }}</h3>
+          <p>{{ option.description }}</p>
+          <button class="btn-primary">Start {{ option.title }}</button>
+        </div>
+      </div>
+    </div>
+  
+    <div class="crisis-logs-section">
+      <h3>Recent Crisis Interactions</h3>
+      <table class="crisis-logs-table">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Timestamp</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let log of recentCrisisLogs">
+            <td>{{ log.type }}</td>
+            <td>{{ log.timestamp | date:'medium' }}</td>
+            <td>{{ log.status }}</td>
+            <td>
+              <button class="btn-secondary">View Details</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  
+    <div class="emergency-contacts-section">
+      <h3>Emergency Contacts</h3>
+      <div class="emergency-contacts-grid">
+        <div *ngFor="let contact of emergencyContacts" class="emergency-contact-card">
+          <h4>{{ contact.name }}</h4>
+          <p>{{ contact.number }}</p>
+          <p>{{ contact.type }} Contact</p>
+          <button class="btn-outline">Call Now</button>
+        </div>
+      </div>
+    </div>
+  
+    <div class="crisis-support-actions">
+      <button class="btn-primary full-width">Report a New Crisis</button>
+    </div>
+  </div>

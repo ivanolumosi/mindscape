@@ -1,11 +1,10 @@
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-counselor-dash',
   standalone: true,
-  imports: [CommonModule,FormsModule],
+  imports: [CommonModule],
   templateUrl: './counselor-dash.component.html',
   styleUrl: './counselor-dash.component.css'
 })

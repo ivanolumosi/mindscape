@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Comment } from '@angular/compiler';
 import { OnInit } from '@angular/core';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Chart } from 'chart.js/auto';
+// import { Chart } from "c:/Users/zilla/Documents/mindscape/frontend/node_modules/chart.js/dist/types";
+import { Chart } from 'chart.js';
 
 @Component({
   selector: 'app-admin',
@@ -69,7 +69,7 @@ export class AdminComponent implements OnInit {
           role: 'seeker',
           status: 'active',
           joinDate: '2024-03-15',
-          avatar: 'assets/avatars/user1.png'
+          avatar: 'assets/images/1user.png'
         },
         {
           id: 2,
@@ -78,7 +78,7 @@ export class AdminComponent implements OnInit {
           role: 'counselor',
           status: 'active',
           joinDate: '2024-02-10',
-          avatar: 'assets/avatars/user2.png'
+          avatar: 'assets/images/1user.png'
         },
         {
           id: 3,
@@ -87,7 +87,7 @@ export class AdminComponent implements OnInit {
           role: 'admin',
           status: 'active',
           joinDate: '2023-11-05',
-          avatar: 'assets/avatars/user3.png'
+          avatar: 'assets/images/1user.png'
         },
         {
           id: 4,
@@ -96,7 +96,7 @@ export class AdminComponent implements OnInit {
           role: 'seeker',
           status: 'inactive',
           joinDate: '2024-01-22',
-          avatar: 'assets/avatars/user4.png'
+          avatar: 'assets/images/1user.png'
         },
         {
           id: 5,
@@ -105,7 +105,7 @@ export class AdminComponent implements OnInit {
           role: 'counselor',
           status: 'pending',
           joinDate: '2024-03-20',
-          avatar: 'assets/avatars/user5.png'
+          avatar: 'assets/images/1user.png'
         }
       ];
       
@@ -154,7 +154,7 @@ export class AdminComponent implements OnInit {
           activeClients: 15,
           sessionsCompleted: 243,
           rating: 4.8,
-          avatar: 'assets/avatars/counselor1.png'
+          avatar: 'assets/images/1user.png'
         },
         {
           id: 2,
@@ -164,7 +164,7 @@ export class AdminComponent implements OnInit {
           activeClients: 12,
           sessionsCompleted: 187,
           rating: 4.7,
-          avatar: 'assets/avatars/counselor2.png'
+          avatar: 'assets/images/1user.png'
         },
         {
           id: 3,
@@ -174,7 +174,7 @@ export class AdminComponent implements OnInit {
           activeClients: 8,
           sessionsCompleted: 126,
           rating: 4.9,
-          avatar: 'assets/avatars/counselor3.png'
+          avatar: 'assets/images/1user.png'
         }
       ];
     }
@@ -183,14 +183,14 @@ export class AdminComponent implements OnInit {
       this.verificationRequests = [
         {
           id: 1,
-          name: 'Dr. Michael Chen',
+          name: 'Dr. Michael kimemia',
           specialization: 'Cognitive Behavioral Therapy',
           submittedDate: '2024-03-18',
           avatar: 'assets/avatars/user5.png'
         },
         {
           id: 2,
-          name: 'Dr. Emily Robinson',
+          name: 'Dr. Emily chege',
           specialization: 'Addiction Recovery',
           submittedDate: '2024-03-20',
           avatar: 'assets/avatars/user6.png'
@@ -227,7 +227,7 @@ export class AdminComponent implements OnInit {
       this.activeCrises = [
         {
           id: 1,
-          userName: 'Michael Brown',
+          userName: 'Michael kimaru',
           severity: 'high',
           timeElapsed: '42 minutes ago',
           description: 'User reported severe anxiety symptoms and difficulty breathing.',
@@ -235,7 +235,7 @@ export class AdminComponent implements OnInit {
         },
         {
           id: 2,
-          userName: 'Jessica Miller',
+          userName: 'Jessica nyawira',
           severity: 'medium',
           timeElapsed: '1 hour ago',
           description: 'User expressed feelings of hopelessness and isolation.',
@@ -243,7 +243,7 @@ export class AdminComponent implements OnInit {
         },
         {
           id: 3,
-          userName: 'David Wilson',
+          userName: 'David Waithera',
           severity: 'high',
           timeElapsed: '2 hours ago',
           description: 'User mentioned self-harm thoughts and requested immediate support.',
@@ -256,8 +256,8 @@ export class AdminComponent implements OnInit {
       this.crisisHistory = [
         {
           id: 1,
-          userName: 'Alex Turner',
-          userAvatar: 'assets/avatars/user7.png',
+          userName: 'Alex wako',
+          userAvatar: 'assets/images/1user.png',
           issue: 'Panic attack',
           counselor: 'Dr. Sarah Williams',
           resolution: 'resolved',
@@ -265,8 +265,8 @@ export class AdminComponent implements OnInit {
         },
         {
           id: 2,
-          userName: 'Emma Davis',
-          userAvatar: 'assets/avatars/user8.png',
+          userName: 'Emma mulamba',
+          userAvatar: 'assets/images/1user.png',
           issue: 'Suicidal ideation',
           counselor: 'Dr. James Wilson',
           resolution: 'referred',
@@ -274,8 +274,8 @@ export class AdminComponent implements OnInit {
         },
         {
           id: 3,
-          userName: 'Thomas Clark',
-          userAvatar: 'assets/avatars/user9.png',
+          userName: 'Thomas Wange',
+          userAvatar: 'assets/images/1user.png',
           issue: 'Severe depression',
           counselor: 'Dr. Lisa Thompson',
           resolution: 'resolved',
@@ -309,16 +309,16 @@ export class AdminComponent implements OnInit {
       this.flaggedContent = [
         {
           id: 1,
-          userName: 'Ryan Parker',
-          userAvatar: 'assets/avatars/user10.png',
+          userName: 'Ryan mwanthis',
+          userAvatar: 'assets/images/1user.png',
           date: '2024-03-22',
           text: 'I\'ve been feeling really down lately and sometimes I think about just disappearing. Not sure if anyone would notice or care.',
           flagReason: 'Potentially harmful content'
         },
         {
           id: 2,
-          userName: 'Olivia White',
-          userAvatar: 'assets/avatars/user11.png',
+          userName: 'Olivia kalaghe',
+          userAvatar: 'assets/images/1user.png',
           date: '2024-03-22',
           text: 'The medication my doctor prescribed isn\'t working. I\'m thinking of doubling the dose to see if that helps.',
           flagReason: 'Medical safety concern'
@@ -401,7 +401,7 @@ export class AdminComponent implements OnInit {
   
     // Chart initialization methods
     initCharts(): void {
-      this.initUserGrowthChart();
+      // this.initUserGrowthChart();
       this.initUserDistributionChart();
       this.initAnalyticsCharts();
     }
@@ -635,4 +635,11 @@ export class AdminComponent implements OnInit {
       
       return Math.floor(seconds) + ' seconds ago';
     }
+    scrollToSection(sectionId: string) {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  
   }

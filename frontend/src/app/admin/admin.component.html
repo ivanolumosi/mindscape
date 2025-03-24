@@ -2,12 +2,12 @@
     <!-- Sidebar -->
     <div class="sidebar">
       <div class="logo-container">
-        <img src="assets/mindscape-logo.png" alt="Mindscape Logo" class="logo">
+        <img src="assets/images/mindscape-logo.png" alt="Mindscape Logo" class="logo">
         <h2>Mindscape</h2>
       </div>
       
       <div class="admin-profile">
-        <img src="assets/admin-avatar.png" alt="Admin Avatar" class="avatar">
+        <img src="assets/images/user.png" alt="Admin Avatar" class="avatar">
         <div>
           <h3>Admin Panel</h3>
           <p>System Administrator</p>
@@ -15,30 +15,31 @@
       </div>
       
       <nav class="sidebar-nav">
-        <a href="#overview" class="nav-item active">
+        <a class="nav-item active" (click)="scrollToSection('overview')">
           <i class="fas fa-chart-pie"></i> Overview
         </a>
-        <a href="#user-management" class="nav-item">
+        <a class="nav-item" (click)="scrollToSection('user-management')">
           <i class="fas fa-users"></i> User Management
         </a>
-        <a href="#counselor-section" class="nav-item">
+        <a class="nav-item" (click)="scrollToSection('counselor-section')">
           <i class="fas fa-user-md"></i> Counselors
         </a>
-        <a href="#crisis-management" class="nav-item">
+        <a class="nav-item" (click)="scrollToSection('crisis-management')">
           <i class="fas fa-exclamation-triangle"></i> Crisis Management
         </a>
-        <a href="#content-moderation" class="nav-item">
+        <a class="nav-item" (click)="scrollToSection('content-moderation')">
           <i class="fas fa-clipboard-check"></i> Content Moderation
         </a>
-        <a href="#notifications" class="nav-item">
+        <a class="nav-item" (click)="scrollToSection('notifications')">
           <i class="fas fa-bell"></i> Notifications
         </a>
-        <a href="#analytics" class="nav-item">
+        <a class="nav-item" (click)="scrollToSection('analytics')">
           <i class="fas fa-chart-line"></i> Analytics
         </a>
-        <a href="#settings" class="nav-item">
+        <a class="nav-item" (click)="scrollToSection('settings')">
           <i class="fas fa-cog"></i> Settings
         </a>
+        
       </nav>
       
       <div class="sidebar-footer">
@@ -67,7 +68,7 @@
             <span class="badge">3</span>
           </button>
           <div class="admin-info">
-            <img src="assets/admin-avatar.png" alt="Admin" class="avatar-small">
+            <img src="assets/images/1user.png" alt="Admin" class="avatar-small">
             <span>Admin</span>
           </div>
         </div>

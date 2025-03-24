@@ -8,6 +8,10 @@ import { GoalsComponent } from './goals/goals.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { CounselorDashComponent } from './counsellor/counselor-dash/counselor-dash.component';
 import { AdminComponent } from './admin/admin.component';
+import { NotFoundComponent } from './not-found/not-found.component';
+import { AssessmentComponent } from './assessment/assessment.component';
+import { FriendsComponent } from './friends/friends.component';
+import { CrisisComponent } from './crisis/crisis.component';
 
 
 export const routes: Routes = [
@@ -18,8 +22,18 @@ export const routes: Routes = [
     { path: 'chatapp', component: ChatAppComponent },
     { path: 'goals', component: GoalsComponent },
     { path: 'sidebar', component: SidebarComponent },
+    { path: 'assessment', component: AssessmentComponent },
+    { path: 'friends', component: FriendsComponent },
 
     { path: 'counsellor', component: CounselorDashComponent },
 
-    { path: 'admin', component: AdminComponent }
+    { path: 'admin', component: AdminComponent },
+
+    { path: 'crisis', component: CrisisComponent },
+
+    { path: '**', component: NotFoundComponent }
+
+    
+
+
 ];

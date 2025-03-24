@@ -34,14 +34,14 @@ export class ChatAppComponent implements OnInit {
   currentUser = {
     id: 1,
     name: 'John Doe',
-    avatar: 'assets/images/avatar.png'
+    avatar: 'assets/images/1user.png'
   };
 
   contacts: ChatContact[] = [
     {
       id: 2,
       name: 'Dr. Sarah Williams',
-      avatar: 'assets/images/dr-sarah.png',
+      avatar: 'assets/images/1user.png',
       status: 'online',
       lastMessage: 'Looking forward to our session today at 2:00 PM',
       unreadCount: 2,
@@ -50,7 +50,7 @@ export class ChatAppComponent implements OnInit {
     {
       id: 3,
       name: 'Anxiety Support Group',
-      avatar: 'assets/images/group-session.png',
+      avatar: 'assets/images/1group.jpeg',
       status: 'online',
       lastMessage: 'David: Does anyone have tips for managing anxiety before presentations?',
       unreadCount: 5,
@@ -59,7 +59,7 @@ export class ChatAppComponent implements OnInit {
     {
       id: 4,
       name: 'Emma Johnson',
-      avatar: 'assets/images/emma.png',
+      avatar: 'assets/images/1user.png',
       status: 'away',
       lastMessage: 'Thanks for sharing that resource!',
       unreadCount: 0,
@@ -68,7 +68,7 @@ export class ChatAppComponent implements OnInit {
     {
       id: 5,
       name: 'Mindfulness Group',
-      avatar: 'assets/images/mindfulness-group.png',
+      avatar: 'assets/images/1group.jpeg',
       status: 'online',
       lastMessage: 'Rachel: Here\'s the link to the guided meditation we discussed',
       unreadCount: 0,
@@ -77,7 +77,7 @@ export class ChatAppComponent implements OnInit {
     {
       id: 6,
       name: 'Support Counselor',
-      avatar: 'assets/images/counselor.png',
+      avatar: 'assets/images/1user.png',
       status: 'online',
       lastMessage: 'Hello John, how can I help you today?',
       unreadCount: 1,
