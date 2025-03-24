@@ -1,12 +1,21 @@
-import express from 'express';
-import * as authController from '../controllers/authController';
+import express, { Request, Response } from 'express';
+import AuthController from '../controllers/authController';
 
 const router = express.Router();
 
-// 🔑 Authentication Routes
-router.post('/register', authController.registerUser);
-router.post('/login', authController.loginUser);
-router.post('/request-password-reset', authController.requestPasswordReset);
-router.post('/request-verification', authController.requestVerificationCode);
+// User Registration Route
+router.post('/register', async (req: Request, res: Response) => {
+    await AuthController.register(req, res);
+});
+
+// User Login Route
+router.post('/login', async (req: Request, res: Response) => {
+    await AuthController.login(req, res);
+});
+
+// User Logout Route
+router.post('/logout', async (req: Request, res: Response) => {
+    await AuthController.logout(req, res);
+});
 
 export default router;

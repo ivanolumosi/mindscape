@@ -1,58 +1,105 @@
 import { Request, Response } from 'express';
-import * as authService from '../services/authservice';
+import AuthService from '../services/authService';
+import { Seeker } from '../interfaces/Seeker';
+import { Admin } from '../interfaces/Admin';
+import { Counselor } from '../interfaces/Counselor';
 
-// ✅ Helper function for error messages
-const getErrorMessage = (err: unknown): string => err instanceof Error ? err.message : 'An unknown error occurred';
+class AuthController {
+    // User Registration
+    static async register(req: Request, res: Response): Promise<Response> {
+        try {
+            const userData: Seeker | Admin | Counselor = req.body;
 
-// ✅ Register a New User
-export const registerUser = async (req: Request, res: Response) => {
-    try {
-        await authService.registerUser(req.body);
-        res.status(201).json({ message: 'User registered successfully' });
-    } catch (error) {
-        console.error('Error registering user:', error);
-        res.status(400).json({ error: getErrorMessage(error) });
+            // Validate required fields
+            if (!userData.name || !userData.email || !userData.password) {
+                return res.status(400).json({ 
+                    message: 'Name, email, and password are required' 
+                });
+            }
+
+            // Validate email format
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(userData.email)) {
+                return res.status(400).json({ 
+                    message: 'Invalid email format' 
+                });
+            }
+
+            // Validate password strength
+            if (userData.password.length < 8) {
+                return res.status(400).json({ 
+                    message: 'Password must be at least 8 characters long' 
+                });
+            }
+
+            // Attempt user registration
+            const userId = await AuthService.register(userData);
+
+            return res.status(201).json({ 
+                message: 'User registered successfully', 
+                userId 
+            });
+        } catch (error) {
+            console.error('Registration error:', error);
+            return res.status(500).json({ 
+                message: 'Registration failed', 
+                error: error instanceof Error ? error.message : 'Unknown error' 
+            });
+        }
     }
-};
 
-// ✅ User Login
-export const loginUser = async (req: Request, res: Response) => {
-    try {
-        const { email, password } = req.body;
-        const user = await authService.loginUser(email, password);
-        if (!user) return res.status(401).json({ error: 'Invalid email or password' });
+    // User Login
+    static async login(req: Request, res: Response) {
+        try {
+            const { email, password } = req.body;
+            const token = await AuthService.login(email, password);
 
-        res.status(200).json(user);
-    } catch (error) {
-        console.error('Error logging in:', error);
-        res.status(500).json({ error: getErrorMessage(error) });
+            // Validate input
+            if (!email || !password) {
+                return res.status(400).json({ 
+                    message: 'Email and password are required' 
+                });
+            }
+
+            
+            // Set token in HTTP-only cookie for added security
+            res.cookie('auth_token', token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+                maxAge: 24 * 60 * 60 * 1000 // 24 hours
+            });
+
+            return res.status(200).json({ 
+                message: 'Login successful', 
+                token 
+            });
+        } catch (error) {
+            console.error('Login error:', error);
+            return res.status(401).json({ 
+                message: 'Login failed', 
+                error: error instanceof Error ? error.message : 'Unknown error' 
+            });
+        }
     }
-};
 
-// ✅ Request Password Reset
-export const requestPasswordReset = async (req: Request, res: Response) => {
-    try {
-        const { email, resetToken } = req.body;
-        if (!email || !resetToken) return res.status(400).json({ error: 'Email and reset token are required' });
+    // User Logout
+    static async logout(req: Request, res: Response): Promise<Response> {
+        try {
+            // Clear the authentication cookie
+            res.clearCookie('auth_token');
 
-        await authService.requestPasswordReset(email, resetToken);
-        res.status(200).json({ message: 'Password reset email sent' });
-    } catch (error) {
-        console.error('Error requesting password reset:', error);
-        res.status(500).json({ error: getErrorMessage(error) });
+            return res.status(200).json({ 
+                message: 'Logout successful' 
+            });
+        } catch (error) {
+            console.error('Logout error:', error);
+            return res.status(500).json({ 
+                message: 'Logout failed', 
+                error: error instanceof Error ? error.message : 'Unknown error' 
+            });
+        }
     }
-};
+}
 
-// ✅ Request Email Verification Code
-export const requestVerificationCode = async (req: Request, res: Response) => {
-    try {
-        const { email, verificationCode } = req.body;
-        if (!email || !verificationCode) return res.status(400).json({ error: 'Email and verification code are required' });
-
-        await authService.requestVerificationCode(email, verificationCode);
-        res.status(200).json({ message: 'Verification email sent' });
-    } catch (error) {
-        console.error('Error requesting verification code:', error);
-        res.status(500).json({ error: getErrorMessage(error) });
-    }
-};
+export default AuthController;

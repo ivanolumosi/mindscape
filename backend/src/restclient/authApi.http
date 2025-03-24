@@ -1,0 +1,61 @@
+### 🏠 Test API Root
+GET http://localhost:3000/
+
+### 1️⃣ Register a New User
+POST http://localhost:3000/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Jeff Kimemia",
+  "email": "Jeffkimemia@example.com",
+  "password": "SecurePass@123",
+  "role": "seeker"
+}
+
+### 2️⃣ Login User
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "johnkamanu@example.com",
+  "password": "SecurePass123"
+}
+
+### 3️⃣ Request Password Reset
+POST http://localhost:3000/api/auth/request-password-reset
+Content-Type: application/json
+
+{
+  "email": "johndoe@example.com"
+}
+
+### 4️⃣ Request Email Verification Code
+POST http://localhost:3000/api/auth/request-verification
+Content-Type: application/json
+
+{
+  "email": "johndoe@example.com"
+}
+
+### 5️⃣ Change User Role (Admin Only)
+PATCH http://localhost:3000/api/auth/change-role
+Content-Type: application/json
+
+{
+  "email": "johndoe@example.com",
+  "newRole": "admin"
+}
+
+### 6️⃣ Get User by Email
+GET http://localhost:3000/api/auth/user?email=johndoe@example.com
+
+### 7️⃣ Delete User (Admin Only)
+DELETE http://localhost:3000/api/auth/delete
+Content-Type: application/json
+
+{
+  "email": "johndoe@example.com"
+}
+
+### 8️⃣ Logout
+POST http://localhost:3000/api/auth/logout

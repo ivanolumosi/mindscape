@@ -6,8 +6,8 @@ POST http://localhost:3000/api/users/register
 Content-Type: application/json
 
 {
-    "name": "Alice Wanja",
-    "email": "alice.wanja@example.com",
+    "name": "Lynn Ejai",
+    "email": "lynnejai@example.com",
     "password": "securepassword",
     "role": "seeker",
     "faculty": "Mental Health"
