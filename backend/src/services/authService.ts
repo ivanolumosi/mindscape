@@ -176,7 +176,96 @@ class AuthService {
         const complexityRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
         return complexityRegex.test(password);
     }
+    async getProfileDetails(userId: number): Promise<any> { // 🚫 No role here
+        try {
+            const pool = await poolPromise;
+            const request = pool.request();
+    
+            if (!userId || isNaN(userId)) {
+                throw new Error('Invalid userId');
+            }
+    
+            request.input('UserId', sql.Int, userId);
+    
+            const result = await request.execute('GetUserProfile');
+    
+            if (!result.recordset || result.recordset.length === 0) {
+                throw new Error('Profile not found');
+            }
+    
+            return result.recordset[0];
+        } catch (error) {
+            console.error('Service - Get Profile Details Error:', error);
+            throw error;
+        }
+    }
+    
+
+// Update Seeker Profile
+async updateSeekerProfile(userId: number, seekerData: Partial<Seeker>): Promise<void> {
+    try {
+        const pool = await poolPromise;
+        const request = pool.request();
+
+        request.input('UserId', sql.Int, userId);
+        request.input('Name', sql.NVarChar, seekerData.name || null);
+        request.input('Email', sql.NVarChar, seekerData.email || null);
+        request.input('Faculty', sql.NVarChar, seekerData.faculty || null);
+        request.input('WantsDailyEmails', sql.Bit, seekerData.wantsDailyEmails ?? 0); // Default to 0 if null
+
+        await request.execute('UpdateSeekerProfile');
+    } catch (error) {
+        console.error('Service - Update Seeker Profile Error:', error);
+        throw error; // Re-throw original error
+    }
 }
+
+// Update Counselor Profile
+async updateCounselorProfile(userId: number, counselorData: Partial<Counselor>): Promise<void> {
+    try {
+        if (!counselorData.profileImage) {
+            throw new Error('Profile image is required for counselors');
+        }
+
+        const pool = await poolPromise;
+        const request = pool.request();
+
+        request.input('UserId', sql.Int, userId);
+        request.input('Name', sql.NVarChar, counselorData.name || null);
+        request.input('Email', sql.NVarChar, counselorData.email || null);
+        request.input('ProfileImage', sql.NVarChar, counselorData.profileImage);
+        request.input('Specialization', sql.NVarChar, counselorData.specialization || null);
+        request.input('AvailabilitySchedule', sql.NVarChar, counselorData.availabilitySchedule || null);
+
+        await request.execute('UpdateCounselorProfile');
+    } catch (error) {
+        console.error('Service - Update Counselor Profile Error:', error);
+        throw error; // Re-throw original error
+    }
+}
+
+async updateUserRole(userId: number, newRole: string): Promise<void> {
+    try {
+        if (!['seeker', 'counselor', 'admin'].includes(newRole.toLowerCase())) {
+            throw new Error('Invalid role specified');
+        }
+
+        const pool = await poolPromise;
+        const request = pool.request();
+
+        request.input('userId', sql.Int, userId);
+        request.input('newRole', sql.NVarChar, newRole);
+
+        await request.execute('UpdateUserRole');
+    } catch (error) {
+        console.error('Update User Role Error:', error);
+        throw new Error('Failed to update user role');
+    }
+}
+
+
+}
+
 
 // Export an instance of the class
 export default new AuthService();

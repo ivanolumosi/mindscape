@@ -4,7 +4,7 @@
     email NVARCHAR(100) UNIQUE NOT NULL,     -- Email address (must be unique)
     password NVARCHAR(255) NOT NULL,         -- Encrypted password
     role NVARCHAR(50) NOT NULL,              -- Role: 'admin', 'counselor', 'seeker'
-    profile_image NVARCHAR(255),             -- URL to the user's profile picture (only for counselors)
+    profile_image NVARCHAR(255),             -- URL to the user's profile picture (compulsory for  for counselors)
     specialization NVARCHAR(100),            -- For counselors: area of expertise
     faculty NVARCHAR(100),                   -- For seekers: their faculty (if applicable)
     privileges NVARCHAR(255),                -- For admins: list of specific privileges
@@ -20,3 +20,6 @@ ADD
     password_reset_token NVARCHAR(255) NULL, -- Token for password reset
     reset_token_expires DATETIME NULL,       -- Expiration time for reset token
     wants_daily_emails BIT DEFAULT 0;        -- Whether user wants daily email notifications
+
+
+SELECT * FROM Users WHERE id = 4020;

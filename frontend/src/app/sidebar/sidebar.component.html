@@ -1,65 +1,53 @@
 <aside class="sidebar">
-    <div class="logo-section">
-      <img src="assets/images/mindscape-logo.png" alt="Mindscape Logo" class="logo">
-      <span class="logo-text">Mindscape</span>
+  <div class="logo-section">
+    <img src="assets/images/mindscape-logo.png" alt="Mindscape Logo" class="logo">
+    <span class="logo-text">Mindscape</span>
+  </div>
+  
+  <!-- User profile section -->
+  <div class="user-profile" *ngIf="currentUser; else loginPrompt">
+    <div class="user-avatar">
+      <img [src]="getUserAvatar()" [alt]="currentUser.name + ' Avatar'">
     </div>
-  
-    <div class="user-profile">
-      <div class="user-avatar">
-        <img src="assets/images/user.png" alt="User Avatar">
-      </div>
-      <div class="user-info">
-        <p class="user-name">John Doe</p>
-        <span class="user-status">Student</span>
-      </div>
+    <div class="user-info">
+      <p class="user-name">{{ currentUser.name }}</p>
+      <span class="user-status">{{ getUserRoleText() }}</span>
     </div>
+  </div>
   
-    <nav class="side-nav">
-      <ul>
-        <li class="nav-item" routerLinkActive="active">
-          <a routerLink="/userdash" class="nav-link">
-            <i class="icon dashboard-icon"></i>
-            <span>Dashboard</span>
-          </a>
-        </li>
-        <li class="nav-item" routerLinkActive="active">
-          <a routerLink="/journal" class="nav-link">
-            <i class="icon journal-icon"></i>
-            <span>Daily Journal</span>
-          </a>
-        </li>
-        <li class="nav-item" routerLinkActive="active">
-          <a routerLink="/chatapp" class="nav-link">
-            <i class="icon chat-icon"></i>
-            <span>Chats</span>
-          </a>
-        </li>
-        <li class="nav-item" routerLinkActive="active">
-          <a routerLink="/goals" class="nav-link">
-            <i class="icon goals-icon"></i>
-            <span>Goals</span>
-          </a>
-        </li>
-        <li class="nav-item" routerLinkActive="active">
-          <a routerLink="/friends" class="nav-link">
-            <i class="icon goals-icon"></i>
-            <span>Friends</span>
-          </a>
-        </li>
-        <li class="nav-item" routerLinkActive="active">
-          <a routerLink="/assessment" class="nav-link">
-            <i class="icon goals-icon"></i>
-            <span>assessment</span>
-          </a>
-        </li>
-      </ul>
-    </nav>
-  
-    <div class="sidebar-footer">
-      <a routerLink="/crisis" class="crisis-help">
-        <i class="icon crisis-icon"></i>
-        <span>Crisis Support</span>
+  <!-- Login prompt if no user -->
+  <ng-template #loginPrompt>
+    <div class="login-prompt">
+      <a routerLink="/login" class="login-link">
+        <i class="icon login-icon"></i>
+        <span>Login / Register</span>
       </a>
     </div>
-  </aside>
+  </ng-template>
   
+  <!-- Dynamic navigation based on user role -->
+  <nav class="side-nav">
+    <ul>
+      <li class="nav-item" *ngFor="let item of navItems" routerLinkActive="active">
+        <a [routerLink]="item.route" class="nav-link">
+          <i class="icon" [ngClass]="item.icon"></i>
+          <span>{{ item.label }}</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  
+  <!-- Sidebar footer -->
+  <div class="sidebar-footer">
+    <a routerLink="/crisis" class="crisis-help">
+      <i class="icon crisis-icon"></i>
+      <span>Crisis Support</span>
+    </a>
+    
+    <!-- Logout button for logged in users -->
+    <a *ngIf="currentUser" (click)="logout()" class="logout-btn">
+      <i class="icon logout-icon"></i>
+      <span>Logout</span>
+    </a>
+  </div>
+</aside>

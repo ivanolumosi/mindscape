@@ -3,8 +3,8 @@ POST http://localhost:3000/api/chat/posts
 Content-Type: application/json
 
 {
-  "userId": 1,
-  "content": "This is my first post!"
+  "userId": 5020,
+  "content": "!"
 }
 
 ### ✅ Get All Posts
@@ -47,7 +47,7 @@ Content-Type: application/json
 
 {
   "senderId": 1,
-  "receiverId": 2,
+  "receiverId": 5020,
   "content": "am good ?"
 }
 
@@ -63,7 +63,7 @@ Content-Type: application/json
 }
 
 ### ✅ Get Unread Messages for a User
-GET http://localhost:3000/api/chat/messages/unread/2
+GET http://localhost:3000/api/chat/messages/unread/5020
 
 ### ✅ Mark a Message as Read
 PATCH http://localhost:3000/api/chat/messages/read/1

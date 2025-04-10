@@ -42,7 +42,7 @@ Content-Type: application/json
 GET http://localhost:3000/api/users
 
 ### 🔍 Get User by ID
-GET http://localhost:3000/api/users/1
+GET http://localhost:3000/api/users/2024
 
 ### 🎓 Get Seekers by Faculty
 GET http://localhost:3000/api/users/faculty/Computer%20Science
@@ -51,7 +51,7 @@ GET http://localhost:3000/api/users/faculty/Computer%20Science
 GET http://localhost:3000/api/users/role/seeker
 
 ### 🔄 Update a User
-PUT http://localhost:3000/api/users/1
+PUT http://localhost:3000/api/users/2024
 Content-Type: application/json
 
 {
@@ -61,7 +61,7 @@ Content-Type: application/json
 }
 
 ### 🗑 Delete a User
-DELETE http://localhost:3000/api/users/1
+DELETE http://localhost:3000/api/users/2024
 
 
 

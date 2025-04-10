@@ -1,33 +1,189 @@
-<div class="auth-container">
-    <div class="bg-overlay"></div>
-    
-    <div class="form-box">
-      <h2>{{ isLoginMode ? 'Login' : 'Sign Up' }}</h2>
-  
-      <p class="quote">"{{ currentQuote }}"</p> 
-  
-      <form *ngIf="isLoginMode">
-        <input type="email" placeholder="Email" required />
-        <input type="password" placeholder="Password" required />
-        <button type="submit">Login</button>
-        <p>Don't have an account? <a (click)="toggleMode()">Sign Up</a></p>
-      </form>
-  
-      <form *ngIf="!isLoginMode">
-        <input type="text" placeholder="Full Name" required />
-        <input type="email" placeholder="Email" required />
-        <input type="password" placeholder="Password" required />
-        <button type="submit">Sign Up</button>
-        <p>Already have an account? <a (click)="toggleMode()">Login</a></p>
-      </form>
-    </div>
-  
-    <footer>
-      <p>&copy; 2025 YourApp. All rights reserved.</p>
-      <div class="social-links">
-        <a href="#">Privacy Policy</a> | 
-        <a href="#">Terms of Service</a>
+<!-- login.component.html -->
+<div class="login-container">
+  <div class="login-box">
+    <div class="row">
+      <!-- Left side with quote and image -->
+      <div class="col-md-6 quote-section">
+        <div class="quote-content">
+          <h2 class="quote-text">"Whoever is happy will make others happy too."</h2>
+          <p class="quote-author">Anne Frank</p>
+        </div>
       </div>
-    </footer>
+      
+      <!-- Right side with form -->
+      <div class="col-md-6 form-section">
+        <div class="form-container">
+          <div class="logo-container">
+            <img src="assets/images/mindscape-logo.png" alt="Mindscape Logo" class="logo">
+          </div>
+          
+          <!-- Login Form -->
+          <div [@formState]="currentState" *ngIf="currentState === 'login'">
+            <h2 class="form-title">Login to Your Account</h2>
+            
+            <!-- Error and success messages -->
+            <div *ngIf="errorMessage" class="alert alert-danger">
+              {{ errorMessage }}
+            </div>
+            <div *ngIf="successMessage" class="alert alert-success">
+              {{ successMessage }}
+            </div>
+            
+            <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+              <div class="form-group">
+                <label for="email">Email Address</label>
+                <input 
+                  type="email" 
+                  id="email" 
+                  formControlName="email" 
+                  class="form-control" 
+                  placeholder="Enter your email"
+                  [ngClass]="{'is-invalid': hasError(loginForm, 'email', 'required') || hasError(loginForm, 'email', 'email')}"
+                >
+                <div *ngIf="hasError(loginForm, 'email', 'required')" class="invalid-feedback">
+                  Email is required
+                </div>
+                <div *ngIf="hasError(loginForm, 'email', 'email')" class="invalid-feedback">
+                  Please enter a valid email
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label for="password">Password</label>
+                <input 
+                  type="password" 
+                  id="password" 
+                  formControlName="password" 
+                  class="form-control" 
+                  placeholder="Enter your password"
+                  [ngClass]="{'is-invalid': hasError(loginForm, 'password', 'required')}"
+                >
+                <div *ngIf="hasError(loginForm, 'password', 'required')" class="invalid-feedback">
+                  Password is required
+                </div>
+              </div>
+              
+              <div class="form-group forgot-password">
+                <a href="javascript:void(0)" routerLink="/forgot-password">Forgot password?</a>
+              </div>
+              
+              <button type="submit" class="btn btn-primary btn-login" [disabled]="isLoading">
+                <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Login
+              </button>
+            </form>
+            
+            <div class="form-footer">
+              <p>Don't have an account? <a href="javascript:void(0)" (click)="toggleForm()">Sign up</a></p>
+            </div>
+          </div>
+          
+          <!-- Register Form -->
+          <div [@formState]="currentState" *ngIf="currentState === 'register'">
+            <h2 class="form-title">Create Your Account</h2>
+            
+            <!-- Error and success messages -->
+            <div *ngIf="errorMessage" class="alert alert-danger">
+              {{ errorMessage }}
+            </div>
+            <div *ngIf="successMessage" class="alert alert-success">
+              {{ successMessage }}
+            </div>
+            
+            <form [formGroup]="registerForm" (ngSubmit)="onRegister()">
+              <div class="form-group">
+                <label for="name">Full Name</label>
+                <input 
+                  type="text" 
+                  id="name" 
+                  formControlName="name" 
+                  class="form-control" 
+                  placeholder="Enter your full name"
+                  [ngClass]="{'is-invalid': hasError(registerForm, 'name', 'required')}"
+                >
+                <div *ngIf="hasError(registerForm, 'name', 'required')" class="invalid-feedback">
+                  Full name is required
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label for="reg-email">Email Address</label>
+                <input 
+                  type="email" 
+                  id="reg-email" 
+                  formControlName="email" 
+                  class="form-control" 
+                  placeholder="Enter your email"
+                  [ngClass]="{'is-invalid': hasError(registerForm, 'email', 'required') || hasError(registerForm, 'email', 'email')}"
+                >
+                <div *ngIf="hasError(registerForm, 'email', 'required')" class="invalid-feedback">
+                  Email is required
+                </div>
+                <div *ngIf="hasError(registerForm, 'email', 'email')" class="invalid-feedback">
+                  Please enter a valid email
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label for="reg-password">Password</label>
+                <input 
+                  type="password" 
+                  id="reg-password" 
+                  formControlName="password" 
+                  class="form-control" 
+                  placeholder="Create a password"
+                  [ngClass]="{'is-invalid': hasError(registerForm, 'password', 'required') || 
+                              hasError(registerForm, 'password', 'minlength') || 
+                              hasError(registerForm, 'password', 'pattern')}"
+                >
+                <div *ngIf="hasError(registerForm, 'password', 'required')" class="invalid-feedback">
+                  Password is required
+                </div>
+                <div *ngIf="hasError(registerForm, 'password', 'minlength')" class="invalid-feedback">
+                  Password must be at least 8 characters
+                </div>
+                <div *ngIf="hasError(registerForm, 'password', 'pattern')" class="invalid-feedback">
+                  Password must include uppercase, lowercase, number, and special character
+                </div>
+                <div *ngIf="registerForm.get('password')?.value" class="password-strength">
+                  <small [ngClass]="getPasswordStrengthClass()">Password Strength: {{ getPasswordStrengthText() }}</small>
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label for="confirm-password">Confirm Password</label>
+                <input 
+                  type="password" 
+                  id="confirm-password" 
+                  formControlName="confirmPassword" 
+                  class="form-control" 
+                  placeholder="Confirm your password"
+                  [ngClass]="{'is-invalid': hasError(registerForm, 'confirmPassword', 'required') || 
+                              registerForm.hasError('passwordMismatch')}"
+                >
+                <div *ngIf="hasError(registerForm, 'confirmPassword', 'required')" class="invalid-feedback">
+                  Please confirm your password
+                </div>
+                <div *ngIf="registerForm.hasError('passwordMismatch')" class="invalid-feedback">
+                  Passwords do not match
+                </div>
+              </div>
+                
+              <!-- Hidden role field - defaults to 'seeker' -->
+              <input type="hidden" formControlName="role">
+              
+              <button type="submit" class="btn btn-primary btn-register" [disabled]="isLoading">
+                <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Create Account
+              </button>
+            </form>
+            
+            <div class="form-footer">
+              <p>Already have an account? <a href="javascript:void(0)" (click)="toggleForm()">Sign in</a></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-  
+</div>

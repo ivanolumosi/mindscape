@@ -1,4 +1,4 @@
-<!-- chat.component.html -->
+<!-- chat-app.component.html -->
 <div class="chat-container">
   <app-sidebar></app-sidebar>
   <!-- Chat Content -->
@@ -20,14 +20,18 @@
       </div>
       
       <div class="chat-contacts">
+        <div *ngIf="contacts.length === 0" class="no-contacts">
+          <p>No conversations yet.</p>
+        </div>
+        
         <div *ngFor="let contact of contacts"
              class="contact-item"
-             [class.active]="selectedContact.id === contact.id"
+             [class.active]="selectedContact && selectedContact.id === contact.id"
              [class.unread]="contact.unreadCount > 0"
              (click)="selectContact(contact)">
           <div class="contact-avatar">
             <img [src]="contact.avatar" alt="Contact Avatar">
-            <span class="status-indicator" [class]="contact.status"></span>
+            <span class="status-indicator" [ngClass]="contact.status"></span>
             <span *ngIf="contact.unreadCount > 0" class="unread-badge">{{contact.unreadCount}}</span>
           </div>
           <div class="contact-info">
@@ -42,12 +46,12 @@
     </div>
     
     <!-- Chat Messages -->
-    <div class="chat-messages">
+    <div class="chat-messages" *ngIf="selectedContact">
       <div class="chat-header">
         <div class="contact-info">
           <div class="contact-avatar">
             <img [src]="selectedContact.avatar" alt="Contact Avatar">
-            <span class="status-indicator" [class]="selectedContact.status"></span>
+            <span class="status-indicator" [ngClass]="selectedContact.status"></span>
           </div>
           <div class="contact-details">
             <div class="contact-name">{{selectedContact.name}}</div>
@@ -55,13 +59,16 @@
           </div>
         </div>
         <div class="chat-actions">
-          <button class="action-btn"><i class="fas fa-phone"></i></button>
-          <button class="action-btn"><i class="fas fa-video"></i></button>
           <button class="action-btn"><i class="fas fa-info-circle"></i></button>
+          <button class="action-btn" (click)="deleteConversation()"><i class="fas fa-trash"></i></button>
         </div>
       </div>
       
       <div class="message-container">
+        <div *ngIf="messages.length === 0" class="no-messages">
+          <p>No messages yet. Start a conversation!</p>
+        </div>
+        
         <div *ngFor="let message of messages; let i = index; let isFirst = first">
           <!-- Date separator -->
           <div *ngIf="isFirst || formatDate(messages[i-1].timestamp) !== formatDate(message.timestamp)" class="date-separator">
@@ -79,7 +86,7 @@
               <div class="message-info">
                 <span class="message-time">{{formatTime(message.timestamp)}}</span>
                 <span *ngIf="message.isOwnMessage" class="message-status">
-                  <i class="fas" [class.fa-check-double]="message.isRead" [class.fa-check]="!message.isRead"></i>
+                  <i class="fas" [ngClass]="{'fa-check-double': message.isRead, 'fa-check': !message.isRead}"></i>
                 </span>
               </div>
             </div>
@@ -98,14 +105,32 @@
           <button class="emoji-btn" (click)="toggleEmojiPicker()">
             <i class="far fa-smile"></i>
           </button>
-          <!-- Emoji picker would be implemented here -->
           <div *ngIf="showEmojiPicker" class="emoji-picker">
-            <!-- Emoji content would go here -->
+            <!-- Simple emoji options -->
+            <div class="emoji-list">
+              <span (click)="addEmoji('😊')">😊</span>
+              <span (click)="addEmoji('👍')">👍</span>
+              <span (click)="addEmoji('❤️')">❤️</span>
+              <span (click)="addEmoji('😂')">😂</span>
+              <span (click)="addEmoji('🙏')">🙏</span>
+              <span (click)="addEmoji('👋')">👋</span>
+              <span (click)="addEmoji('🎉')">🎉</span>
+              <span (click)="addEmoji('🤔')">🤔</span>
+            </div>
           </div>
         </div>
         <button class="send-btn" [disabled]="!newMessage.trim()" (click)="sendMessage()">
           <i class="fas fa-paper-plane"></i>
         </button>
+      </div>
+    </div>
+    
+    <!-- Empty state when no contact is selected -->
+    <div class="empty-chat" *ngIf="!selectedContact">
+      <div class="empty-chat-content">
+        <img src="assets/images/chat-placeholder.png" alt="Select a conversation">
+        <h3>Select a conversation</h3>
+        <p>Choose a contact to start chatting</p>
       </div>
     </div>
   </div>

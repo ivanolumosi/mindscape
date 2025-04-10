@@ -1,0 +1,105 @@
+<div class="profile-container">
+    <div class="profile-header">
+      <h1>Complete Your Profile</h1>
+      <p class="subtitle">
+        {{ isFirstTimeUser ? 'Welcome! Let\'s set up your profile' : 'Update your profile information' }}
+      </p>
+    </div>
+  
+    <div class="profile-card">
+      <div *ngIf="isLoading" class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Loading your profile...</p>
+      </div>
+  
+      <div *ngIf="errorMessage" class="error-message">
+        <p>{{ errorMessage }}</p>
+      </div>
+  
+      <div *ngIf="submitSuccess" class="success-message">
+        <p>Profile updated successfully! Redirecting to your dashboard...</p>
+      </div>
+  
+      <form *ngIf="!isLoading && !submitSuccess" [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+        <div class="profile-image-section">
+          <div class="profile-image">
+            <img [src]="profileForm.get('profileImage')?.value || defaultProfileImage" alt="Profile Image">
+          </div>
+          <div class="image-upload">
+            <label for="profile-upload">Change Profile Image</label>
+            <input type="file" id="profile-upload" accept="image/*" (change)="handleImageChange($event)">
+            <p class="hint">Recommended size: 200x200px</p>
+          </div>
+        </div>
+  
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <input type="text" id="name" formControlName="name" placeholder="Your full name">
+          <div *ngIf="profileForm.get('name')?.invalid && profileForm.get('name')?.touched" class="error-text">
+            Please enter your full name
+          </div>
+        </div>
+  
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" formControlName="email" placeholder="your.email@example.com">
+          <div *ngIf="profileForm.get('email')?.invalid && profileForm.get('email')?.touched" class="error-text">
+            Please enter a valid email address
+          </div>
+        </div>
+  
+        <!-- Seeker specific fields -->
+        <div *ngIf="isSeeker">
+          <div class="form-group">
+            <label for="faculty">Faculty/Department</label>
+            <select id="faculty" formControlName="faculty">
+              <option value="">Select your faculty</option>
+              <option *ngFor="let faculty of faculties" [value]="faculty">{{ faculty }}</option>
+            </select>
+          </div>
+  
+          <div class="form-group checkbox-group">
+            <input type="checkbox" id="dailyEmails" formControlName="wantsDailyEmails">
+            <label for="dailyEmails">Receive daily inspirational emails and mental wellness tips</label>
+          </div>
+        </div>
+  
+        <!-- Counselor specific fields -->
+        <div *ngIf="!isSeeker">
+          <div class="form-group">
+            <label for="specialization">Specialization</label>
+            <select id="specialization" formControlName="specialization" required>
+              <option value="">Select your specialization</option>
+              <option *ngFor="let spec of specializations" [value]="spec">{{ spec }}</option>
+            </select>
+            <div *ngIf="profileForm.get('specialization')?.invalid && profileForm.get('specialization')?.touched" class="error-text">
+              Specialization is required for counselors
+            </div>
+          </div>
+  
+          <div class="form-group">
+            <label for="availabilitySchedule">Availability Schedule</label>
+            <textarea id="availabilitySchedule" formControlName="availabilitySchedule" 
+                     placeholder="E.g., Mon-Fri: 9am-5pm, Sat: 10am-2pm"></textarea>
+            <div *ngIf="profileForm.get('availabilitySchedule')?.invalid && profileForm.get('availabilitySchedule')?.touched" class="error-text">
+              Please provide your availability schedule
+            </div>
+          </div>
+        </div>
+  
+        <div class="form-actions">
+          <button type="submit" class="primary-button" [disabled]="profileForm.invalid || isLoading">
+            Save Profile
+          </button>
+          <button type="button" class="secondary-button" *ngIf="isSeeker" (click)="skipProfile()">
+            Skip for Now
+          </button>
+        </div>
+      </form>
+  
+      <div class="inspiration-quote" *ngIf="!isLoading && !submitSuccess">
+        <p>"The greatest glory in living lies not in never falling, but in rising every time we fall."</p>
+        <span>— Nelson Mandela</span>
+      </div>
+    </div>
+  </div>

@@ -26,7 +26,7 @@ GET http://localhost:3000/api/goals/user/1/status?isCompleted=true
 GET http://localhost:3000/api/goals/user/1/status?isCompleted=false
 
 ### 6️⃣ Get Goal by ID
-GET http://localhost:3000/api/goals/10
+GET http://localhost:3000/api/goals/2
 
 ### 7️⃣ Track Goal Progress
 GET http://localhost:3000/api/goals/10/progress

@@ -17,7 +17,7 @@ DELETE http://localhost:3000/api/journal/2
 GET http://localhost:3000/api/journal/2
 
 ### 4️⃣ Get All Journal Entries for a User
-GET http://localhost:3000/api/journal/user/1
+GET http://localhost:3000/api/journal/user/6019
 
 ### 5️⃣ Get Journal Entries by Date Range
 GET http://localhost:3000/api/journal/user/1/date-range?startDate=2024-02-01&endDate=2024-02-20

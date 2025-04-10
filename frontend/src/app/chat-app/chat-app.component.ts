@@ -1,17 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, Pipe, PipeTransform } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SidebarComponent } from '../sidebar/sidebar.component';
-
-interface Message {
-  id: number;
-  senderId: number;
-  senderName: string;
-  content: string;
-  timestamp: Date;
-  isRead: boolean;
-  isOwnMessage: boolean;
-}
+import { ChatAppService } from '../services/chat-app.service';
+import { AuthService, User } from '../services/auth.service';
+import { DirectMessage } from '../interfaces/Direct_messages';
+import { interval, Subscription } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 interface ChatContact {
   id: number;
@@ -23,136 +18,124 @@ interface ChatContact {
   timestamp: Date;
 }
 
+interface DisplayMessage {
+  id: number;
+  senderId: number;
+  senderName: string;
+  content: string;
+  timestamp: Date;
+  isRead: boolean;
+  isOwnMessage: boolean;
+}
+
 @Component({
   selector: 'app-chat-app',
   standalone: true,
-  imports: [CommonModule,FormsModule,SidebarComponent],
+  imports: [CommonModule, FormsModule, SidebarComponent],
   templateUrl: './chat-app.component.html',
   styleUrl: './chat-app.component.css'
 })
-export class ChatAppComponent implements OnInit {
-  currentUser = {
-    id: 1,
-    name: 'John Doe',
-    avatar: 'assets/images/1user.png'
-  };
-
-  contacts: ChatContact[] = [
-    {
-      id: 2,
-      name: 'Dr. Sarah Williams',
-      avatar: 'assets/images/1user.png',
-      status: 'online',
-      lastMessage: 'Looking forward to our session today at 2:00 PM',
-      unreadCount: 2,
-      timestamp: new Date('2025-03-17T10:30:00')
-    },
-    {
-      id: 3,
-      name: 'Anxiety Support Group',
-      avatar: 'assets/images/1group.jpeg',
-      status: 'online',
-      lastMessage: 'David: Does anyone have tips for managing anxiety before presentations?',
-      unreadCount: 5,
-      timestamp: new Date('2025-03-17T09:15:00')
-    },
-    {
-      id: 4,
-      name: 'Emma Johnson',
-      avatar: 'assets/images/1user.png',
-      status: 'away',
-      lastMessage: 'Thanks for sharing that resource!',
-      unreadCount: 0,
-      timestamp: new Date('2025-03-16T18:45:00')
-    },
-    {
-      id: 5,
-      name: 'Mindfulness Group',
-      avatar: 'assets/images/1group.jpeg',
-      status: 'online',
-      lastMessage: 'Rachel: Here\'s the link to the guided meditation we discussed',
-      unreadCount: 0,
-      timestamp: new Date('2025-03-16T14:20:00')
-    },
-    {
-      id: 6,
-      name: 'Support Counselor',
-      avatar: 'assets/images/1user.png',
-      status: 'online',
-      lastMessage: 'Hello John, how can I help you today?',
-      unreadCount: 1,
-      timestamp: new Date('2025-03-17T11:05:00')
-    }
-  ];
-
-  selectedContact: ChatContact = this.contacts[0];
-  messages: Message[] = [];
+export class ChatAppComponent implements OnInit, OnDestroy {
+  currentUser: User | null = null;
+  contacts: ChatContact[] = [];
+  selectedContact: ChatContact | null = null;
+  messages: DisplayMessage[] = [];
   newMessage: string = '';
   showEmojiPicker: boolean = false;
+  
+  private messagesSubscription?: Subscription;
+  private unreadMessagesSubscription?: Subscription;
+
+  constructor(
+    private chatService: ChatAppService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit() {
-    // Load dummy messages for the selected contact
-    this.loadMessages(this.selectedContact.id);
+    this.currentUser = this.authService.getCurrentUser();
+    
+    if (!this.currentUser) {
+      console.error('No current user found');
+      return;
+    }
+    
+    // Load unread messages and update contacts
+    this.loadUnreadMessages();
+    
+    // Poll for new unread messages every 30 seconds
+    this.unreadMessagesSubscription = interval(30000).pipe(
+      switchMap(() => this.chatService.getUnreadMessages())
+    ).subscribe(messages => {
+      this.updateContactsWithUnreadMessages(messages);
+    });
   }
 
-  loadMessages(contactId: number) {
-    // In a real app, you would fetch messages from a service
-    this.messages = [
-      {
-        id: 1,
-        senderId: 2,
-        senderName: 'Dr. Sarah Williams',
-        content: 'Good morning John! How have you been feeling since our last session?',
-        timestamp: new Date('2025-03-17T09:30:00'),
-        isRead: true,
-        isOwnMessage: false
+  ngOnDestroy() {
+    if (this.messagesSubscription) {
+      this.messagesSubscription.unsubscribe();
+    }
+    if (this.unreadMessagesSubscription) {
+      this.unreadMessagesSubscription.unsubscribe();
+    }
+  }
+
+  loadUnreadMessages() {
+    this.chatService.getUnreadMessages().subscribe(
+      messages => {
+        this.updateContactsWithUnreadMessages(messages);
       },
-      {
-        id: 2,
-        senderId: 1,
-        senderName: 'John Doe',
-        content: 'Hi Dr. Williams. I\'ve been practicing the mindfulness techniques you suggested, and they\'ve been helping with my anxiety.',
-        timestamp: new Date('2025-03-17T09:32:00'),
-        isRead: true,
-        isOwnMessage: true
-      },
-      {
-        id: 3,
-        senderId: 2,
-        senderName: 'Dr. Sarah Williams',
-        content: 'That\'s wonderful to hear! Which technique did you find most effective?',
-        timestamp: new Date('2025-03-17T09:33:00'),
-        isRead: true,
-        isOwnMessage: false
-      },
-      {
-        id: 4,
-        senderId: 1,
-        senderName: 'John Doe',
-        content: 'The breathing exercises really helped when I felt overwhelmed. I also tried the body scan meditation before bed, and it improved my sleep quality.',
-        timestamp: new Date('2025-03-17T09:35:00'),
-        isRead: true,
-        isOwnMessage: true
-      },
-      {
-        id: 5,
-        senderId: 2,
-        senderName: 'Dr. Sarah Williams',
-        content: 'I\'m glad those techniques are working for you. For our session today, I\'d like to discuss how we can build on this progress. Is there anything specific you\'d like to focus on?',
-        timestamp: new Date('2025-03-17T09:40:00'),
-        isRead: false,
-        isOwnMessage: false
-      },
-      {
-        id: 6,
-        senderId: 2,
-        senderName: 'Dr. Sarah Williams',
-        content: 'Also, I\'ve attached some additional resources on managing anxiety in social situations that we can review together.',
-        timestamp: new Date('2025-03-17T09:42:00'),
-        isRead: false,
-        isOwnMessage: false
+      error => {
+        console.error('Error loading unread messages:', error);
       }
-    ];
+    );
+  }
+
+  updateContactsWithUnreadMessages(messages: DirectMessage[]) {
+    // Group messages by sender
+    const messagesBySender = messages.reduce((acc, message) => {
+      const userId = message.senderId;
+      if (!acc[userId]) {
+        acc[userId] = [];
+      }
+      acc[userId].push(message);
+      return acc;
+    }, {} as Record<number, DirectMessage[]>);
+    
+    // Update existing contacts or create new ones
+    Object.entries(messagesBySender).forEach(([userId, userMessages]) => {
+      const senderId = parseInt(userId);
+      const latestMessage = userMessages.sort((a, b) => 
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      )[0];
+      
+      // Find existing contact or create new one
+      let contact = this.contacts.find(c => c.id === senderId);
+      
+      if (contact) {
+        contact.lastMessage = latestMessage.content;
+        contact.timestamp = new Date(latestMessage.createdAt);
+        contact.unreadCount = userMessages.length;
+      } else {
+        // Create a new contact from the message data
+        this.contacts.push({
+          id: senderId,
+          name: latestMessage.senderName || `User ${senderId}`,
+          avatar: latestMessage.senderAvatar || 'assets/images/1user.png',
+          status: 'online', // Default status
+          lastMessage: latestMessage.content,
+          unreadCount: userMessages.length,
+          timestamp: new Date(latestMessage.createdAt)
+        });
+      }
+    });
+    
+    // Sort contacts by latest message time
+    this.contacts.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+    
+    // If no contact is selected yet and we have contacts, select the first one
+    if (!this.selectedContact && this.contacts.length > 0) {
+      this.selectContact(this.contacts[0]);
+    }
   }
 
   selectContact(contact: ChatContact) {
@@ -161,31 +144,94 @@ export class ChatAppComponent implements OnInit {
     contact.unreadCount = 0;
     // Load messages for this contact
     this.loadMessages(contact.id);
+    
+    // Cancel previous subscription if exists
+    if (this.messagesSubscription) {
+      this.messagesSubscription.unsubscribe();
+    }
+    
+    // Set up polling for new messages with this contact
+    this.messagesSubscription = interval(10000).pipe(
+      switchMap(() => this.chatService.getConversation(contact.id))
+    ).subscribe(messages => {
+      this.updateMessages(messages);
+    });
+  }
+
+  loadMessages(contactId: number) {
+    if (!this.currentUser?.id) {
+      console.error('Current user ID not available');
+      return;
+    }
+    
+    this.chatService.getConversation(contactId).subscribe(
+      messages => {
+        this.updateMessages(messages);
+        
+        // Mark unread messages as read
+        messages
+          .filter(m => !m.isRead && m.senderId === contactId)
+          .forEach(m => {
+            this.chatService.markMessageAsRead(m.id).subscribe();
+          });
+      },
+      error => {
+        console.error('Error loading messages:', error);
+      }
+    );
+  }
+
+  updateMessages(directMessages: DirectMessage[]) {
+    if (!this.currentUser?.id) return;
+    
+    this.messages = directMessages.map(dm => ({
+      id: dm.id,
+      senderId: dm.senderId,
+      senderName: dm.senderName || `User ${dm.senderId}`,
+      content: dm.content,
+      timestamp: new Date(dm.createdAt),
+      isRead: dm.isRead,
+      isOwnMessage: dm.senderId === this.currentUser!.id
+    }));
+    
+    // Sort messages by timestamp
+    this.messages.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
   }
 
   sendMessage() {
-    if (!this.newMessage.trim()) return;
+    if (!this.newMessage.trim() || !this.selectedContact || !this.currentUser?.id) return;
     
-    const newMsg: Message = {
-      id: this.messages.length + 1,
-      senderId: this.currentUser.id,
-      senderName: this.currentUser.name,
-      content: this.newMessage,
-      timestamp: new Date(),
-      isRead: true,
-      isOwnMessage: true
-    };
-    
-    this.messages.push(newMsg);
-    this.newMessage = '';
-    // Scroll to bottom of message container (would be implemented in a real app)
+    this.chatService.sendDirectMessage(this.selectedContact.id, this.newMessage).subscribe(
+      message => {
+        // Add the new message to our display
+        this.messages.push({
+          id: message.id,
+          senderId: message.senderId,
+          senderName: this.currentUser!.name,
+          content: message.content,
+          timestamp: new Date(message.createdAt),
+          isRead: message.isRead,
+          isOwnMessage: true
+        });
+        
+        // Update contact's last message
+        if (this.selectedContact) {
+          this.selectedContact.lastMessage = message.content;
+          this.selectedContact.timestamp = new Date(message.createdAt);
+        }
+        
+        this.newMessage = '';
+      },
+      error => {
+        console.error('Error sending message:', error);
+      }
+    );
   }
 
   toggleEmojiPicker() {
     this.showEmojiPicker = !this.showEmojiPicker;
   }
 
-  // This would be implemented to handle emoji selection
   addEmoji(emoji: string) {
     this.newMessage += emoji;
     this.showEmojiPicker = false;
@@ -208,5 +254,29 @@ export class ChatAppComponent implements OnInit {
     }
     
     return date.toLocaleDateString();
+  }
+
+  deleteConversation() {
+    if (!this.selectedContact) return;
+    
+    if (confirm(`Are you sure you want to delete all messages with ${this.selectedContact.name}?`)) {
+      this.chatService.deleteConversation(this.selectedContact.id).subscribe(
+        () => {
+          // Remove this contact from the list
+          this.contacts = this.contacts.filter(c => c.id !== this.selectedContact!.id);
+          this.messages = [];
+          
+          // Select another contact if available
+          if (this.contacts.length > 0) {
+            this.selectContact(this.contacts[0]);
+          } else {
+            this.selectedContact = null;
+          }
+        },
+        error => {
+          console.error('Error deleting conversation:', error);
+        }
+      );
+    }
   }
 }

@@ -117,3 +117,4 @@ export function trackGoalProgress(arg0: number) {
 export function updateGoalStatus(arg0: number, isCompleted: any, progressPercentage: any) {
     throw new Error('Function not implemented.');
 }
+    

@@ -1,142 +1,151 @@
 <!-- daily-journal.component.html -->
 <div class="journal-page-container">
-    <!-- Sidebar -->
-    <app-sidebar></app-sidebar>
-    <!-- Main Content -->
-    <div class="main-content">
-      <!-- Header -->
-      <div class="header">
-        <h1>Daily Journal</h1>
-        <div class="date">{{ currentDate }}</div>
+  <!-- Sidebar -->
+  <app-sidebar></app-sidebar>
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Header -->
+    <div class="header">
+      <h1>Daily Journal</h1>
+      <div class="date">{{ currentDate }}</div>
+    </div>
+
+    <!-- Error/Success Messages -->
+    <div class="message error-message" *ngIf="errorMessage">
+      <p>{{ errorMessage }}</p>
+    </div>
+    <div class="message success-message" *ngIf="successMessage">
+      <p>{{ successMessage }}</p>
+    </div>
+
+    <!-- Motivational Quote -->
+    <div class="quote-section">
+      <div class="quote">
+        <p>"{{ currentQuote.text }}"</p>
+        <span class="author">— {{ currentQuote.author }}</span>
       </div>
-  
-      <!-- Motivational Quote -->
-      <div class="quote-section">
-        <div class="quote">
-          <p>"{{ currentQuote.text }}"</p>
-          <span class="author">— {{ currentQuote.author }}</span>
+    </div>
+
+    <!-- Journal Entry Form -->
+    <div class="journal-entry-form">
+      <h2>{{ isEditing ? 'Edit Journal Entry' : 'How are you feeling today?' }}</h2>
+      
+      <div class="mood-selector">
+        <div class="mood-option" [class.selected]="selectedMood === 'Great'" (click)="selectMood('Great')">
+          <div class="mood-icon great"></div>
+          <span>Great</span>
+        </div>
+        <div class="mood-option" [class.selected]="selectedMood === 'Good'" (click)="selectMood('Good')">
+          <div class="mood-icon good"></div>
+          <span>Good</span>
+        </div>
+        <div class="mood-option" [class.selected]="selectedMood === 'Okay'" (click)="selectMood('Okay')">
+          <div class="mood-icon okay"></div>
+          <span>Okay</span>
+        </div>
+        <div class="mood-option" [class.selected]="selectedMood === 'Down'" (click)="selectMood('Down')">
+          <div class="mood-icon down"></div>
+          <span>Down</span>
+        </div>
+        <div class="mood-option" [class.selected]="selectedMood === 'Bad'" (click)="selectMood('Bad')">
+          <div class="mood-icon bad"></div>
+          <span>Bad</span>
         </div>
       </div>
-  
-      <!-- Journal Entry Form -->
-      <div class="journal-entry-form">
-        <h2>How are you feeling today?</h2>
+
+      <div class="form-group">
+        <label for="journalDate">Date</label>
+        <input type="date" id="journalDate" [(ngModel)]="journalEntry.entry_date">
+      </div>
+
+      <div class="form-group">
+        <label for="journalReflections">Reflections</label>
+        <textarea id="journalReflections" [(ngModel)]="journalEntry.reflections" rows="6" placeholder="What's on your mind today?"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="journalGratitude">Gratitude</label>
+        <textarea id="journalGratitude" [(ngModel)]="journalEntry.gratitude" rows="4" placeholder="What are you grateful for today?"></textarea>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn-save" (click)="saveJournalEntry()" [disabled]="isLoading">
+          {{ isLoading ? 'Saving...' : (isEditing ? 'Update Entry' : 'Save Entry') }}
+        </button>
+        <button class="btn-cancel" (click)="clearForm()" [disabled]="isLoading">Clear</button>
+      </div>
+    </div>
+
+    <!-- Previous Entries -->
+    <div class="previous-entries">
+      <div class="section-header">
+        <h2>Previous Entries</h2>
+        <div class="filters">
+          <select [(ngModel)]="filterTimeRange">
+            <option value="week">This Week</option>
+            <option value="month">This Month</option>
+            <option value="year">This Year</option>
+            <option value="all">All Time</option>
+          </select>
+          <button class="filter-button" (click)="applyFilter()">Apply</button>
+        </div>
+      </div>
+
+      <div class="entries-list">
+        <!-- Loading indicator -->
+        <div class="loading-indicator" *ngIf="isLoading">
+          <p>Loading journal entries...</p>
+        </div>
         
-        <div class="mood-selector">
-          <div class="mood-option" [class.selected]="selectedMood === 'Great'" (click)="selectMood('Great')">
-            <div class="mood-icon great"></div>
-            <span>Great</span>
+        <!-- Journal entries -->
+        <div class="entry-card" *ngFor="let entry of journalEntries">
+          <div class="entry-header">
+            <div class="entry-date">{{ entry.entry_date ? formatDate(entry.entry_date) : 'N/A' }}</div>
           </div>
-          <div class="mood-option" [class.selected]="selectedMood === 'Good'" (click)="selectMood('Good')">
-            <div class="mood-icon good"></div>
-            <span>Good</span>
+          <div class="entry-mood">
+            <div class="mood-icon small" [ngClass]="getMoodClass(entry.mood)"></div>
+            <span>{{ entry.mood }}</span>
           </div>
-          <div class="mood-option" [class.selected]="selectedMood === 'Okay'" (click)="selectMood('Okay')">
-            <div class="mood-icon okay"></div>
-            <span>Okay</span>
+          <div class="entry-content">
+            <h4>Reflections:</h4>
+            <div class="entry-preview">{{ entry.reflections }}</div>
+            <h4>Gratitude:</h4>
+            <div class="entry-preview">{{ entry.gratitude }}</div>
           </div>
-          <div class="mood-option" [class.selected]="selectedMood === 'Down'" (click)="selectMood('Down')">
-            <div class="mood-icon down"></div>
-            <span>Down</span>
-          </div>
-          <div class="mood-option" [class.selected]="selectedMood === 'Bad'" (click)="selectMood('Bad')">
-            <div class="mood-icon bad"></div>
-            <span>Bad</span>
+          <div class="entry-actions">
+            <button class="btn-edit" (click)="editJournalEntry(entry)">Edit</button>
+            <button class="btn-delete" (click)="deleteJournalEntry(entry.id)">Delete</button>
           </div>
         </div>
-  
-        <div class="form-group">
-          <label for="journalTitle">Title</label>
-          <input type="text" id="journalTitle" [(ngModel)]="journalEntry.title" placeholder="Give your entry a title...">
-        </div>
-  
-        <div class="form-group">
-          <label for="journalContent">What's on your mind?</label>
-          <textarea id="journalContent" [(ngModel)]="journalEntry.content" rows="10" placeholder="Write your thoughts here..."></textarea>
-        </div>
-  
-        <div class="journal-tags">
-          <label>Tags</label>
-          <div class="tags-input">
-            <div class="tag" *ngFor="let tag of journalEntry.tags; let i = index">
-              {{ tag }}
-              <span class="remove-tag" (click)="removeTag(i)">×</span>
-            </div>
-            <input type="text" [(ngModel)]="newTag" placeholder="Add tag..." 
-                   (keydown.enter)="addTag(); $event.preventDefault()">
-          </div>
-        </div>
-  
-        <div class="action-buttons">
-          <button class="btn-save" (click)="saveJournalEntry()">Save Entry</button>
-          <button class="btn-cancel" (click)="clearForm()">Clear</button>
+
+        <!-- Show this when there are no entries -->
+        <div class="no-entries" *ngIf="journalEntries.length === 0 && !isLoading">
+          <p>No journal entries found for this period.</p>
         </div>
       </div>
-  
-      <!-- Previous Entries -->
-      <div class="previous-entries">
-        <div class="section-header">
-          <h2>Previous Entries</h2>
-          <div class="filters">
-            <select [(ngModel)]="filterTimeRange">
-              <option value="week">This Week</option>
-              <option value="month">This Month</option>
-              <option value="year">This Year</option>
-              <option value="all">All Time</option>
-            </select>
-            <button class="filter-button">Apply</button>
-          </div>
+    </div>
+
+    <!-- Journal Stats -->
+    <div class="journal-stats">
+      <h2>Your Journal Stats</h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value">{{ stats.TotalEntries }}</div>
+          <div class="stat-label">Total Entries</div>
         </div>
-  
-        <div class="entries-list">
-          <!-- Sample entries (in a real app these would be dynamically generated) -->
-          <div class="entry-card" *ngFor="let entry of mockEntries">
-            <div class="entry-header">
-              <div class="entry-title">{{ entry.title }}</div>
-              <div class="entry-date">{{ entry.createdAt }}</div>
-            </div>
-            <div class="entry-mood">
-              <div class="mood-icon small" [ngClass]="entry.mood.toLowerCase()"></div>
-              <span>{{ entry.mood }}</span>
-            </div>
-            <div class="entry-preview">{{ entry.content }}</div>
-            <div class="entry-tags">
-              <div class="tag small" *ngFor="let tag of entry.tags">{{ tag }}</div>
-            </div>
-            <div class="entry-actions">
-              <button class="btn-edit">Edit</button>
-              <button class="btn-delete">Delete</button>
-            </div>
-          </div>
-  
-          <!-- Show this when there are no entries -->
-          <div class="no-entries" *ngIf="mockEntries.length === 0">
-            <p>No journal entries found for this period.</p>
-          </div>
+        <div class="stat-card">
+          <div class="stat-value">{{ stats.EntryStreak }}</div>
+          <div class="stat-label">Day Streak</div>
         </div>
-      </div>
-  
-      <!-- Journal Stats -->
-      <div class="journal-stats">
-        <h2>Your Journal Stats</h2>
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-value">15</div>
-            <div class="stat-label">Total Entries</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value">7</div>
-            <div class="stat-label">Day Streak</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value">Good</div>
-            <div class="stat-label">Average Mood</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value">Growth</div>
-            <div class="stat-label">Top Tag</div>
-          </div>
+        <div class="stat-card">
+          <div class="stat-value">{{ stats.AverageMood }}</div>
+          <div class="stat-label">Common Mood</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">{{ stats.FirstEntryDate ? formatDate(stats.FirstEntryDate) : 'N/A' }}</div>
+          <div class="stat-label">First Entry</div>
         </div>
       </div>
     </div>
   </div>
+</div>

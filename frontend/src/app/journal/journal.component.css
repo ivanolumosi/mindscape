@@ -483,3 +483,83 @@
       grid-template-columns: 1fr 1fr;
     }
   }
+
+  /* Add these styles to daily-journal.component.css */
+
+/* Message Styles */
+.message {
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+}
+
+.message p {
+  margin: 0;
+}
+
+.error-message {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border-left: 4px solid #ef4444;
+}
+
+.success-message {
+  background-color: #d1fae5;
+  color: #065f46;
+  border-left: 4px solid #10b981;
+}
+
+/* Loading Indicator */
+.loading-indicator {
+  text-align: center;
+  padding: 20px;
+  color: #6b7280;
+  grid-column: 1 / -1;
+}
+
+/* Entry Content */
+.entry-content {
+  margin-bottom: 15px;
+}
+
+.entry-content h4 {
+  font-size: 14px;
+  color: #4b5563;
+  margin: 10px 0 5px 0;
+}
+
+/* Status Badge */
+.status-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-badge.editing {
+  background-color: #e0f2fe;
+  color: #0369a1;
+}
+
+/* Disabled Button */
+button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Responsive Improvements */
+@media (max-width: 576px) {
+  .mood-selector {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

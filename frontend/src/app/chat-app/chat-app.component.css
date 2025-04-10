@@ -529,3 +529,54 @@
 .send-btn:not(:disabled):hover {
   background-color: #1c8a5e;
 }
+/* Additional styles for chat-app.component.css */
+.no-contacts, .no-messages {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+  color: #888;
+  font-size: 14px;
+}
+
+.empty-chat {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f8f9fa;
+}
+
+.empty-chat-content {
+  text-align: center;
+  color: #888;
+}
+
+.empty-chat-content img {
+  width: 120px;
+  height: 120px;
+  opacity: 0.5;
+  margin-bottom: 20px;
+}
+
+.empty-chat-content h3 {
+  font-size: 18px;
+  margin-bottom: 10px;
+  color: #666;
+}
+
+.emoji-list {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.emoji-list span {
+  font-size: 24px;
+  padding: 8px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.emoji-list span:hover {
+  transform: scale(1.2);
+}

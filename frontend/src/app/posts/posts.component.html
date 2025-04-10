@@ -1,0 +1,160 @@
+<div class="post-feed-container flex">
+    <!-- Sidebar -->
+    <div class="sidebar-container">
+      <app-sidebar></app-sidebar>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+      <div class="post-feed-header">
+        <h1 class="text-2xl font-bold text-green-700">Timeline</h1>
+        <button 
+          (click)="loadPosts()" 
+          class="refresh-button flex items-center"
+          [disabled]="isLoading">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          Refresh
+        </button>
+      </div>
+  
+      <!-- Messages -->
+      <div class="message-container">
+        <div *ngIf="successMessage" class="success-message">
+          {{ successMessage }}
+        </div>
+        <div *ngIf="errorMessage" class="error-message">
+          {{ errorMessage }}
+        </div>
+      </div>
+  
+      <!-- Create Post Section -->
+      <div class="create-post-container">
+        <textarea 
+          [(ngModel)]="newPost" 
+          placeholder="What's on your mind?" 
+          class="create-post-textarea"
+          [disabled]="isSubmitting">
+        </textarea>
+        <div class="create-post-actions">
+          <button 
+            (click)="createPost()" 
+            class="post-button"
+            [disabled]="!newPost.trim() || isSubmitting">
+            {{ isSubmitting ? 'Posting...' : 'Post' }}
+          </button>
+        </div>
+      </div>
+  
+      <!-- Loading Indicator -->
+      <div *ngIf="isLoading" class="loading-container">
+        <div class="loading-spinner"></div>
+        <span>Loading posts...</span>
+      </div>
+  
+      <!-- Posts Feed -->
+      <div *ngIf="!isLoading && posts.length === 0" class="no-posts-message">
+        No posts yet. Be the first to share something!
+      </div>
+  
+      <div class="posts-container">
+        <div 
+          *ngFor="let post of posts" 
+          class="post-card" 
+          [ngClass]="getPostBackgroundColor(post.id)"
+          (click)="toggleComments(post)">
+          
+          <!-- Post Header -->
+          <div class="post-header">
+            <div class="user-info" (click)="viewUserProfile(post.userId, $event)">
+              <div class="avatar">
+                <span>{{ post.userName ? post.userName[0].toUpperCase() : 'U' }}</span>
+                <img *ngIf="post.userImage" [src]="post.userImage" alt="User avatar">
+  <img *ngIf="!post.userImage" src="assets/user1.png" alt="Default avatar">
+              </div>
+              <div class="user-details">
+                <span class="username">{{ post.userName || post.UserName || 'Anonymous' }}</span>
+                <span class="timestamp">{{ formatDate(post.createdAt) }}</span>
+              </div>
+            </div>
+            <div *ngIf="isOwnPost(post)" class="post-actions">
+              <button class="delete-button" (click)="deletePost(post, $event)" title="Delete post">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Post Content -->
+          <div class="post-content">
+            {{ post.content }}
+          </div>
+          
+          <!-- Post Footer -->
+          <div class="post-footer">
+            <button class="comments-button">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+              </svg>
+              {{ post.comments.length > 0 ? post.comments.length : '' }} {{ post.showComments ? 'Hide Comments' : 'Comments' }}
+            </button>
+          </div>
+          
+          <!-- Comments Section -->
+          <div *ngIf="post.showComments" class="comments-section">
+            <div *ngIf="post.isLoading" class="comments-loading">
+              <div class="loading-spinner"></div>
+              <span>Loading comments...</span>
+            </div>
+            
+            <div *ngIf="!post.isLoading && post.comments.length === 0" class="no-comments">
+              No comments yet. Be the first to comment!
+            </div>
+            
+            <div *ngIf="!post.isLoading && post.comments.length > 0" class="comments-list">
+              <div *ngFor="let comment of post.comments" class="comment-card">
+                <div class="comment-header">
+                  <div class="user-info" (click)="viewUserProfile(comment.userId, $event)">
+                    <div class="avatar">
+                      <span>{{ comment.userName ? comment.userName[0].toUpperCase() : 'U' }}</span>
+                    </div>
+                    <div class="user-details">
+                      <span class="username">{{ comment.userName || 'Anonymous' }}</span>
+                      <span class="timestamp">{{ formatDate(comment.createdAt) }}</span>
+                    </div>
+                  </div>
+                  <div *ngIf="isOwnComment(comment)" class="comment-actions">
+                    <button class="delete-button" (click)="deleteComment(post, comment, $event)" title="Delete comment">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+                <div class="comment-content">
+                  {{ comment.content }}
+                </div>
+              </div>
+            </div>
+            
+            <!-- Add Comment -->
+            <div class="add-comment-container">
+              <textarea 
+                [(ngModel)]="post.newComment" 
+                placeholder="Add a comment..." 
+                class="add-comment-textarea">
+              </textarea>
+              <button 
+                (click)="addComment(post)" 
+                class="comment-button"
+                [disabled]="!post.newComment.trim()">
+                Comment
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

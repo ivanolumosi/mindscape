@@ -1,122 +1,73 @@
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SidebarComponent } from '../sidebar/sidebar.component';
+import { AuthService } from '../services/auth.service';
+import { finalize } from 'rxjs/operators';
+import { Goal, GoalService } from '../services/goal.service';
 
-interface Goal {
-  id: number;
-  title: string;
-  description: string;
-  category: string;
-  progress: number;
-  dueDate: string;
-  isCompleted: boolean;
-  priority: 'Low' | 'Medium' | 'High';
-}
 @Component({
   selector: 'app-goals',
   standalone: true,
-  imports: [CommonModule,FormsModule,SidebarComponent],
+  imports: [CommonModule, FormsModule, SidebarComponent],
   templateUrl: './goals.component.html',
-  styleUrl: './goals.component.css'
+  styleUrls: ['./goals.component.css']
 })
-export class GoalsComponent {
+export class GoalsComponent implements OnInit {
   goals: Goal[] = [];
-  categories: string[] = ['Mental Health', 'Physical Health', 'Personal Growth', 'Social', 'Career'];
+  categories = ['Mental Health', 'Physical Health', 'Personal Growth', 'Social', 'Career'];
+  goalTypes: ('Daily' | 'Weekly' | 'Monthly')[] = ['Daily', 'Weekly', 'Monthly'];
   selectedCategory: string = 'All';
   showAddGoalForm: boolean = false;
-  newGoal: Goal = {
-    id: 0,
-    title: '',
-    description: '',
-    category: 'Mental Health',
-    progress: 0,
+  isLoading: boolean = false;
+  error: string | null = null;
+  userName: string = ''; // Added userName property
+  today: Date = new Date(); // Added today property for date pipe
+  
+  newGoal = {
+    goalTitle: '',
+    goalDescription: '',
+    goalType: 'Weekly' as 'Daily' | 'Weekly' | 'Monthly',
     dueDate: '',
-    isCompleted: false,
-    priority: 'Medium'
+    category: 'Mental Health'
   };
-new: any;
 
-  constructor() { }
+  constructor(
+    private goalService: GoalService,
+    private authService: AuthService
+  ) { }
 
   ngOnInit(): void {
-    // Load dummy data
-    this.loadDummyGoals();
+    this.loadGoals();
+    this.getUserName();
   }
 
-  loadDummyGoals(): void {
-    this.goals = [
-      {
-        id: 1,
-        title: 'Practice mindfulness meditation',
-        description: 'Meditate for 10 minutes daily to reduce anxiety',
-        category: 'Mental Health',
-        progress: 80,
-        dueDate: '2025-04-15',
-        isCompleted: false,
-        priority: 'High'
-      },
-      {
-        id: 2,
-        title: 'Read self-help books',
-        description: 'Complete reading "Atomic Habits" and take notes',
-        category: 'Personal Growth',
-        progress: 65,
-        dueDate: '2025-03-30',
-        isCompleted: false,
-        priority: 'Medium'
-      },
-      {
-        id: 3,
-        title: 'Join a study group',
-        description: 'Find and join a study group for final exams',
-        category: 'Social',
-        progress: 50,
-        dueDate: '2025-03-25',
-        isCompleted: false,
-        priority: 'Medium'
-      },
-      {
-        id: 4,
-        title: 'Complete sleep assessment',
-        description: 'Track sleep patterns for a week and analyze results',
-        category: 'Physical Health',
-        progress: 0,
-        dueDate: '2025-04-10',
-        isCompleted: false,
-        priority: 'Low'
-      },
-      {
-        id: 5,
-        title: 'Exercise regularly',
-        description: 'Go for a 30-minute walk at least 3 times per week',
-        category: 'Physical Health',
-        progress: 40,
-        dueDate: '2025-05-01',
-        isCompleted: false,
-        priority: 'High'
-      },
-      {
-        id: 6,
-        title: 'Learn to manage stress',
-        description: 'Identify personal stress triggers and develop coping mechanisms',
-        category: 'Mental Health',
-        progress: 30,
-        dueDate: '2025-04-20',
-        isCompleted: false,
-        priority: 'High'
-      },
-      {
-        id: 7,
-        title: 'Build professional portfolio',
-        description: 'Create and organize work samples for future job applications',
-        category: 'Career',
-        progress: 20,
-        dueDate: '2025-06-15',
-        isCompleted: false,
-        priority: 'Medium'
-      }
-    ];
+  // Add method to get the user name
+  getUserName(): void {
+    const currentUser = this.authService.getCurrentUser();
+    this.userName = currentUser?.name || 'User';
+  }
+
+  loadGoals(): void {
+    this.isLoading = true;
+    this.goalService.getGoals()
+      .pipe(finalize(() => this.isLoading = false))
+      .subscribe({
+        next: (goals) => {
+          this.goals = goals;
+          // Add category field to each goal for filtering (since backend doesn't have category)
+          this.goals.forEach(goal => {
+            // Assign a random category for demo purposes if not already set
+            if (!goal.category) {
+              goal.category = this.categories[Math.floor(Math.random() * this.categories.length)];
+            }
+          });
+        },
+        error: (err) => {
+          console.error('Error loading goals', err);
+          this.error = 'Failed to load goals. Please try again.';
+        }
+      });
   }
 
   filterByCategory(category: string): void {
@@ -132,36 +83,120 @@ new: any;
 
   toggleAddGoalForm(): void {
     this.showAddGoalForm = !this.showAddGoalForm;
-  }
-
-  saveNewGoal(): void {
-    // In a real app, this would send data to a service
-    this.newGoal.id = this.goals.length + 1;
-    this.goals.push({...this.newGoal});
-    
-    // Reset form
-    this.newGoal = {
-      id: 0,
-      title: '',
-      description: '',
-      category: 'Mental Health',
-      progress: 0,
-      dueDate: '',
-      isCompleted: false,
-      priority: 'Medium'
-    };
-    
-    this.showAddGoalForm = false;
-  }
-
-  updateGoalProgress(goal: Goal, progress: number): void {
-    goal.progress = progress;
-    if (progress === 100) {
-      goal.isCompleted = true;
+    if (this.showAddGoalForm) {
+      // Reset form
+      this.newGoal = {
+        goalTitle: '',
+        goalDescription: '',
+        goalType: 'Weekly',
+        dueDate: '',
+        category: 'Mental Health'
+      };
     }
   }
 
+  saveNewGoal(): void {
+    if (!this.newGoal.goalTitle) {
+      this.error = 'Goal title is required';
+      return;
+    }
+
+    this.isLoading = true;
+    this.goalService.addGoal({
+      goalTitle: this.newGoal.goalTitle,
+      goalDescription: this.newGoal.goalDescription || null,
+      goalType: this.newGoal.goalType,
+      dueDate: this.newGoal.dueDate || null,
+      category: this.newGoal.category
+    })
+    .pipe(finalize(() => this.isLoading = false))
+    .subscribe({
+      next: (goal) => {
+        // Ensure the category is set
+        if (!goal.category) {
+          goal.category = this.newGoal.category;
+        }
+        this.goals.push(goal);
+        this.showAddGoalForm = false;
+        this.error = null;
+      },
+      error: (err) => {
+        console.error('Error adding goal', err);
+        this.error = 'Failed to add goal. Please try again.';
+      }
+    });
+  }
+
+  updateGoalProgress(goal: Goal, progress: number): void {
+    if (progress < 0) progress = 0;
+    if (progress > 100) progress = 100;
+    
+    const isCompleted = progress === 100;
+    
+    this.goalService.updateGoalStatus(goal.id!, isCompleted, progress)
+      .subscribe({
+        next: (updatedGoal) => {
+          // Update the local goal object
+          const index = this.goals.findIndex(g => g.id === goal.id);
+          if (index !== -1) {
+            // Preserve the category we added for frontend
+            if (!updatedGoal.category) {
+              updatedGoal.category = goal.category;
+            }
+            this.goals[index] = updatedGoal;
+          }
+        },
+        error: (err) => {
+          console.error('Error updating goal progress', err);
+          // Revert progress change on error
+          goal.progress_percentage = goal.progress_percentage || 0;
+        }
+      });
+  }
+
   deleteGoal(goalId: number): void {
-    this.goals = this.goals.filter(goal => goal.id !== goalId);
+    if (confirm('Are you sure you want to delete this goal?')) {
+      this.goalService.deleteGoal(goalId)
+        .subscribe({
+          next: (success) => {
+            if (success) {
+              this.goals = this.goals.filter(goal => goal.id !== goalId);
+            } else {
+              this.error = 'Failed to delete goal.';
+            }
+          },
+          error: (err) => {
+            console.error('Error deleting goal', err);
+            this.error = 'Failed to delete goal. Please try again.';
+          }
+        });
+    }
+  }
+
+  formatDate(dateString: string | null): string {
+    if (!dateString) return 'No due date';
+    return new Date(dateString).toLocaleDateString();
+  }
+
+  getTotalGoalsCount(): number {
+    return this.goals.length;
+  }
+
+  getCompletedGoalsCount(): number {
+    return this.goals.filter(goal => goal.is_completed).length;
+  }
+
+  getOverdueGoalsCount(): number {
+    const today = new Date();
+    return this.goals.filter(goal => 
+      !goal.is_completed && 
+      goal.due_date && 
+      new Date(goal.due_date) < today
+    ).length;
+  }
+
+  getHighPriorityGoalsCount(): number {
+    // Simulate priority since the backend doesn't have it
+    return Math.floor(this.goals.filter(goal => !goal.is_completed).length / 3);
   }
 }

@@ -6,8 +6,8 @@ POST http://localhost:3000/api/auth/register
 Content-Type: application/json
 
 {
-  "name": "Jeff Kimemia",
-  "email": "Jeffkimemia@example.com",
+  "name": "Jeff Kinuthia",
+  "email": "Jeffkinuthia@example.com",
   "password": "SecurePass@123",
   "role": "seeker"
 }
@@ -17,9 +17,86 @@ POST http://localhost:3000/api/auth/login
 Content-Type: application/json
 
 {
-  "email": "johnkamanu@example.com",
-  "password": "SecurePass123"
+  "email": "Jeffkinuthia@example.com",
+  "password": "SecurePass@123"
 }
+
+### 🏠 Test API Root
+GET http://localhost:3000/
+
+### 1️⃣ Register a New User
+POST http://localhost:3000/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Alphonse Owino",
+  "email": "alphonsepeters@example.com",
+  "password": "SecurePass@123",
+  "role": "seeker"
+}
+
+### 2️⃣ Login User
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "Jeffkinuthia@example.com",
+  "password": "SecurePass@123"
+}
+
+### 3️⃣ 🚪 Logout User
+POST http://localhost:3000/api/auth/logout
+Content-Type: application/json
+
+
+### 6️⃣ Get User Profile
+GET http://localhost:3000/api/auth/profile/details?userId=4020
+Content-Type: application/json
+
+### 5️⃣ Update Seeker Profile
+PUT http://localhost:3000/api/auth/profile/seeker
+Content-Type: application/json
+
+{
+  "userId": 2024,
+  "email": "newemail@example.com",
+  "profileImage": "https://example.com/new-image.png",
+  "faculty": "Business",
+  "name": "New Name",
+  "password": "NewSecurePass@123"
+}
+
+### 5️⃣ Update counsellor Profile
+PUT http://localhost:3000/api/auth/profile/counselor
+Content-Type: application/json
+
+{
+  "userId":2024,
+  "name": "John Doe",                         
+  "email": "john.doe@example.com",             
+  "profileImage": "https://example.com/counselor-image.png",
+  "specialization": "Career Counseling",
+  "availabilitySchedule": "Mon-Fri 9am-5pm"
+}
+
+### 7️⃣ Update User Role
+PUT http://localhost:3000/api/auth/role/update
+Content-Type: application/json
+
+{
+  "userId": 2025,
+  "newRole": "counselor"
+}
+
+
+
+
+
+
+
+
+
+
 
 ### 3️⃣ Request Password Reset
 POST http://localhost:3000/api/auth/request-password-reset
