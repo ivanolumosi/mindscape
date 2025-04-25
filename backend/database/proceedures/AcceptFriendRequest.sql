@@ -2,6 +2,8 @@ CREATE PROCEDURE AcceptFriendRequest
     @request_id INT
 AS
 BEGIN
+    SET NOCOUNT ON;
+
     DECLARE @sender_id INT;
     DECLARE @receiver_id INT;
 
@@ -15,22 +17,13 @@ BEGIN
     SET status = 'Accepted'
     WHERE id = @request_id;
 
-    -- Add the friendship
+    -- Add the friendship (mutual)
     INSERT INTO Friends (user_id, friend_id)
     VALUES (@sender_id, @receiver_id),
-           (@receiver_id, @sender_id); -- Create mutual friendship
+           (@receiver_id, @sender_id);
+
+    -- Return the updated friend request
+    SELECT *
+    FROM FriendRequests
+    WHERE id = @request_id;
 END;
-
-
-
-
-
-
-
-
-
-
-
-
-SELECT * FROM FriendRequests;
-SELECT * FROM Friends;

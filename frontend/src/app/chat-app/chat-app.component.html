@@ -1,137 +1,282 @@
-<!-- chat-app.component.html -->
 <div class="chat-container">
   <app-sidebar></app-sidebar>
-  <!-- Chat Content -->
-  <div class="chat-content">
-    <!-- Chat List -->
-    <div class="chat-list">
-      <div class="chat-list-header">
-        <h2>Conversations</h2>
-        <button class="new-chat-btn">
-          <i class="fas fa-plus"></i>
-        </button>
+  <!-- Main Chat Content -->
+  <div class="main-content">
+    <!-- Top Navigation -->
+    <div class="top-nav">
+      <div class="search-bar">
+        <i class="fas fa-search"></i>
+        <input type="text" placeholder="Search for conversations..." />
       </div>
-      
-      <div class="chat-search">
-        <div class="search-box">
-          <i class="fas fa-search search-icon"></i>
-          <input type="text" placeholder="Search conversations..." class="search-input">
+      <div class="user-actions">
+        <div class="notification-icon">
+          <i class="fas fa-bell"></i>
+          <span *ngIf="unreadCount.total > 0" class="badge">{{unreadCount.total}}</span>
         </div>
-      </div>
-      
-      <div class="chat-contacts">
-        <div *ngIf="contacts.length === 0" class="no-contacts">
-          <p>No conversations yet.</p>
-        </div>
-        
-        <div *ngFor="let contact of contacts"
-             class="contact-item"
-             [class.active]="selectedContact && selectedContact.id === contact.id"
-             [class.unread]="contact.unreadCount > 0"
-             (click)="selectContact(contact)">
-          <div class="contact-avatar">
-            <img [src]="contact.avatar" alt="Contact Avatar">
-            <span class="status-indicator" [ngClass]="contact.status"></span>
-            <span *ngIf="contact.unreadCount > 0" class="unread-badge">{{contact.unreadCount}}</span>
-          </div>
-          <div class="contact-info">
-            <div class="contact-header">
-              <span class="contact-name">{{contact.name}}</span>
-              <span class="contact-time">{{formatTime(contact.timestamp)}}</span>
-            </div>
-            <div class="contact-message">{{contact.lastMessage}}</div>
-          </div>
+        <div class="user-profile">
+          <img [src]="currentUser?.profileImage || 'assets/images/avatar1.png'" alt="Profile" />
         </div>
       </div>
     </div>
     
-    <!-- Chat Messages -->
-    <div class="chat-messages" *ngIf="selectedContact">
-      <div class="chat-header">
-        <div class="contact-info">
-          <div class="contact-avatar">
-            <img [src]="selectedContact.avatar" alt="Contact Avatar">
-            <span class="status-indicator" [ngClass]="selectedContact.status"></span>
-          </div>
-          <div class="contact-details">
-            <div class="contact-name">{{selectedContact.name}}</div>
-            <div class="contact-status">{{selectedContact.status}}</div>
-          </div>
-        </div>
-        <div class="chat-actions">
-          <button class="action-btn"><i class="fas fa-info-circle"></i></button>
-          <button class="action-btn" (click)="deleteConversation()"><i class="fas fa-trash"></i></button>
-        </div>
-      </div>
-      
-      <div class="message-container">
-        <div *ngIf="messages.length === 0" class="no-messages">
-          <p>No messages yet. Start a conversation!</p>
+    <!-- Chat Interface -->
+    <div class="chat-interface">
+      <!-- Chat List -->
+      <div class="chat-list">
+        <div class="chat-list-header">
+          <h2>Conversations</h2>
+          <button class="new-chat-btn" (click)="openNewChatModal()">
+            <i class="fas fa-plus"></i>
+          </button>
         </div>
         
-        <div *ngFor="let message of messages; let i = index; let isFirst = first">
-          <!-- Date separator -->
-          <div *ngIf="isFirst || formatDate(messages[i-1].timestamp) !== formatDate(message.timestamp)" class="date-separator">
-            <span>{{formatDate(message.timestamp)}}</span>
+        <div class="chat-tabs">
+          <div class="tab" [class.active]="activeTab === 'all'" (click)="setActiveTab('all')">All Conversations</div>
+          <div class="tab" [class.active]="activeTab === 'friends'" (click)="setActiveTab('friends')">Friends</div>
+        </div>
+        
+        <div class="chat-search">
+          <div class="search-box">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" placeholder="Search conversations..." [(ngModel)]="searchQuery" class="search-input">
+          </div>
+        </div>
+        
+        <div class="chat-contacts">
+          <div *ngIf="filteredContacts.length === 0" class="no-contacts">
+            <p>No conversations yet.</p>
+            <button class="btn btn-primary" (click)="openNewChatModal()">Start a Conversation</button>
           </div>
           
-          <div class="message" [class.own-message]="message.isOwnMessage">
-            <div class="message-avatar" *ngIf="!message.isOwnMessage">
-              <img [src]="selectedContact.avatar" alt="Avatar">
+          <div *ngFor="let contact of filteredContacts"
+               class="contact-item"
+               [class.active]="selectedContact && selectedContact.id === contact.id"
+               [class.unread]="contact.unread_count > 0"
+               (click)="selectContact(contact)">
+            <div class="contact-avatar">
+              <img [src]="contact.profile_image || 'assets/images/avatar1.png'" alt="Contact Avatar">
+              <span class="status-indicator" [ngClass]="contact.status"></span>
+              <span *ngIf="contact.unread_count > 0" class="unread-badge">{{contact.unread_count}}</span>
             </div>
-            <div class="message-content">
-              <div class="message-bubble">
-                <div class="message-text">{{message.content}}</div>
-              </div>
-              <div class="message-info">
-                <span class="message-time">{{formatTime(message.timestamp)}}</span>
-                <span *ngIf="message.isOwnMessage" class="message-status">
-                  <i class="fas" [ngClass]="{'fa-check-double': message.isRead, 'fa-check': !message.isRead}"></i>
+            <div class="contact-info">
+              <div class="contact-header">
+                <span class="contact-name">
+                  {{contact.name}}
+                  <i *ngIf="contact.is_friend" class="fas fa-user-friends friend-icon" title="Friend"></i>
+                  <i *ngIf="contact.is_counselor" class="fas fa-user-md counselor-icon" title="Counselor"></i>
                 </span>
+                <span class="contact-time" *ngIf="contact.last_message_time">{{formatTime(contact.last_message_time)}}</span>
               </div>
+              <div class="contact-message">{{contact.last_message_content || 'No messages yet'}}</div>
             </div>
           </div>
         </div>
       </div>
       
-      <div class="message-composer">
-        <button class="composer-btn"><i class="fas fa-paperclip"></i></button>
-        <div class="composer-input-container">
-          <input type="text" 
-                class="composer-input" 
-                placeholder="Type a message..." 
-                [(ngModel)]="newMessage" 
-                (keyup.enter)="sendMessage()">
-          <button class="emoji-btn" (click)="toggleEmojiPicker()">
-            <i class="far fa-smile"></i>
-          </button>
-          <div *ngIf="showEmojiPicker" class="emoji-picker">
-            <!-- Simple emoji options -->
-            <div class="emoji-list">
-              <span (click)="addEmoji('😊')">😊</span>
-              <span (click)="addEmoji('👍')">👍</span>
-              <span (click)="addEmoji('❤️')">❤️</span>
-              <span (click)="addEmoji('😂')">😂</span>
-              <span (click)="addEmoji('🙏')">🙏</span>
-              <span (click)="addEmoji('👋')">👋</span>
-              <span (click)="addEmoji('🎉')">🎉</span>
-              <span (click)="addEmoji('🤔')">🤔</span>
+      <!-- Chat Messages -->
+      <div class="chat-messages" *ngIf="selectedContact">
+        <div class="chat-header">
+          <div class="contact-info">
+            <div class="contact-avatar">
+              <img [src]="selectedContact.profile_image || 'assets/images/avatar1.png'" alt="Contact Avatar">
+              <span class="status-indicator" [ngClass]="selectedContact.status"></span>
+            </div>
+            <div class="contact-details">
+              <div class="contact-name">
+                {{selectedContact.name}}
+                <i *ngIf="selectedContact.is_friend" class="fas fa-user-friends friend-icon" title="Friend"></i>
+                <i *ngIf="selectedContact.is_counselor" class="fas fa-user-md counselor-icon" title="Counselor"></i>
+              </div>
+              <div class="contact-status">{{getStatusText(selectedContact.status || 'offline')}}</div>
             </div>
           </div>
+          <div class="chat-actions">
+            <button class="action-btn" title="Video Call"><i class="fas fa-video"></i></button>
+            <button class="action-btn" title="Voice Call"><i class="fas fa-phone"></i></button>
+            <button class="action-btn" title="User Info" (click)="toggleUserInfo()"><i class="fas fa-info-circle"></i></button>
+            <button class="action-btn" title="Delete Conversation" (click)="confirmDeleteConversation()"><i class="fas fa-trash"></i></button>
+          </div>
         </div>
-        <button class="send-btn" [disabled]="!newMessage.trim()" (click)="sendMessage()">
-          <i class="fas fa-paper-plane"></i>
-        </button>
+        
+        <div class="message-container">
+          <div *ngIf="messages.length === 0" class="no-messages">
+            <div class="empty-state">
+              <i class="fas fa-comments"></i>
+              <p>No messages yet. Start a conversation!</p>
+            </div>
+          </div>
+          
+          <ng-container *ngFor="let message of messages; let i = index; let isFirst = first">
+            <!-- Date separator -->
+            <div *ngIf="isFirst || shouldShowDateSeparator(messages[i-1], message)" class="date-separator">
+              <span>{{formatDate(message.createdAt)}}</span>
+            </div>
+            
+            <div class="message" [class.own-message]="message.senderId === (currentUser?.id || 0)">
+              <div class="message-avatar" *ngIf="message.senderId !== (currentUser?.id || 0)">
+                <img [src]="selectedContact.profile_image || 'assets/images/avatar1.png'" alt="Avatar">
+              </div>
+              <div class="message-content">
+                <div class="message-bubble">
+                  <!-- Handle different content types -->
+                  <div *ngIf="message.contentType === 'text'" class="message-text">{{message.content}}</div>
+                  
+                  <div *ngIf="message.contentType === 'image'" class="message-media">
+                    <img [src]="message.mediaUrl" alt="Image" class="media-image">
+                  </div>
+                  
+                  <div *ngIf="message.contentType === 'file'" class="message-file">
+                    <i class="fas fa-file-alt"></i>
+                    <span>{{message.content}}</span>
+                  </div>
+                </div>
+                <div class="message-info">
+                  <span class="message-time">{{formatTime(message.createdAt)}}</span>
+                  <span *ngIf="message.senderId === (currentUser?.id || 0)" class="message-status">
+                    <i class="fas" [ngClass]="{'fa-check-double': message.isRead, 'fa-check': !message.isRead}"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+        
+        <div class="message-composer">
+          <button class="composer-btn" title="Attach File" (click)="openFilePicker()">
+            <i class="fas fa-paperclip"></i>
+          </button>
+          <div class="composer-input-container">
+            <input type="text" 
+                  class="composer-input" 
+                  placeholder="Type a message..." 
+                  [(ngModel)]="newMessage" 
+                  (keyup.enter)="sendMessage()">
+            <button class="emoji-btn" (click)="toggleEmojiPicker()">
+              <i class="far fa-smile"></i>
+            </button>
+            <div *ngIf="showEmojiPicker" class="emoji-picker">
+              <div class="emoji-list">
+                <span *ngFor="let emoji of commonEmojis" (click)="addEmoji(emoji)">{{emoji}}</span>
+              </div>
+            </div>
+          </div>
+          <button class="send-btn" [disabled]="!newMessage.trim()" (click)="sendMessage()">
+            <i class="fas fa-paper-plane"></i>
+          </button>
+        </div>
       </div>
-    </div>
-    
-    <!-- Empty state when no contact is selected -->
-    <div class="empty-chat" *ngIf="!selectedContact">
-      <div class="empty-chat-content">
-        <img src="assets/images/chat-placeholder.png" alt="Select a conversation">
-        <h3>Select a conversation</h3>
-        <p>Choose a contact to start chatting</p>
+      
+      <!-- User Info Sidebar (conditionally shown) -->
+      <div class="user-info-sidebar" *ngIf="showUserInfo && selectedContact">
+        <div class="user-info-header">
+          <h3>User Information</h3>
+          <button class="close-btn" (click)="toggleUserInfo()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="user-info-content">
+          <div class="user-avatar-large">
+            <img [src]="selectedContact.profile_image || 'assets/images/avatar1.png'" alt="User Avatar">
+          </div>
+          <h2 class="user-name">{{selectedContact.name}}</h2>
+          <div *ngIf="selectedContact.nickname" class="user-nickname">{{selectedContact.nickname}}</div>
+          <div class="user-status">
+            <span class="status-indicator" [ngClass]="selectedContact.status || 'offline'"></span>
+            <span>{{getStatusText(selectedContact.status || 'offline')}}</span>
+          </div>
+          
+          <div class="user-actions">
+            <button class="btn btn-primary" *ngIf="!selectedContact.is_friend" (click)="sendFriendRequest(selectedContact.id)">
+              <i class="fas fa-user-plus"></i> Add Friend
+            </button>
+            <button class="btn btn-secondary" *ngIf="selectedContact.is_friend" (click)="removeFriend(selectedContact.id)">
+              <i class="fas fa-user-minus"></i> Remove Friend
+            </button>
+            <button class="btn btn-block" (click)="blockUser(selectedContact.id)">
+              <i class="fas fa-ban"></i> Block User
+            </button>
+          </div>
+          
+          <div class="shared-groups" *ngIf="sharedGroups.length > 0">
+            <h4>Shared Groups</h4>
+            <ul>
+              <li *ngFor="let group of sharedGroups">{{group.name}}</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Empty state when no contact is selected -->
+      <div class="empty-chat" *ngIf="!selectedContact">
+        <div class="empty-chat-content">
+          <img src="assets/images/empty1.png" alt="Select a conversation">
+          <h3>Select a conversation</h3>
+          <p>Choose a contact to start chatting</p>
+        </div>
       </div>
     </div>
   </div>
 </div>
+
+<!-- New Chat Modal -->
+<div class="modal" *ngIf="showNewChatModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Start New Conversation</h3>
+      <button class="close-btn" (click)="closeNewChatModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="search-container">
+        <input type="text" [(ngModel)]="userSearchQuery" placeholder="Search for users..." class="search-input">
+      </div>
+      
+      <div class="user-tabs">
+        <div class="tab" [class.active]="modalTab === 'friends'" (click)="setModalTab('friends')">Friends</div>
+        <div class="tab" [class.active]="modalTab === 'suggested'" (click)="setModalTab('suggested')">Suggested</div>
+      </div>
+      
+      <div class="user-list">
+        <div *ngIf="filteredUsers.length === 0" class="no-users">
+          <p>No users found.</p>
+        </div>
+        
+        <div *ngFor="let user of filteredUsers" class="user-item" (click)="startChat(user)">
+          <div class="user-avatar">
+            <img [src]="user.profileImage || 'assets/images/avatar1.png'" alt="User Avatar">
+            <span class="status-indicator" [ngClass]="user.status || 'offline'"></span>
+          </div>
+          <div class="user-info">
+            <div class="user-name">{{user.name}}</div>
+            <div class="user-role">{{user.role === 'counselor' ? 'Counselor' : 'User'}}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal" *ngIf="showDeleteModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Delete Conversation</h3>
+      <button class="close-btn" (click)="cancelDelete()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p>Are you sure you want to delete this conversation with <strong>{{selectedContact?.name}}</strong>?</p>
+      <p class="warning-text">This action cannot be undone.</p>
+      
+      <div class="modal-actions">
+        <button class="btn btn-secondary" (click)="cancelDelete()">Cancel</button>
+        <button class="btn btn-danger" (click)="deleteConversation()">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- File upload input (hidden) -->
+<input type="file" #fileInput style="display: none" (change)="handleFileUpload($event)">

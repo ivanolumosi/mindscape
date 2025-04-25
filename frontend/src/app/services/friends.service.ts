@@ -9,14 +9,12 @@ export interface Friend {
   id: number;
   userId: number;
   friendId: number;
-  status: 'accepted' | 'pending' | 'rejected';
-  createdAt: Date;
-  updatedAt: Date;
-  name?: string;
-  email?: string;
+  username: string; // Assuming this comes from the Friend interface in backend
+  email: string;
   profileImage?: string;
   faculty?: string;
   role?: string;
+  createdAt: Date;
 }
 
 export interface FriendRequest {
@@ -26,7 +24,9 @@ export interface FriendRequest {
   status: 'pending' | 'accepted' | 'rejected';
   createdAt: Date;
   updatedAt: Date;
+  // Additional properties that might be joined from user table
   senderName?: string;
+  senderEmail?: string;
   senderProfileImage?: string;
 }
 
@@ -38,11 +38,13 @@ export class FriendsService {
   private usersApiUrl = 'http://localhost:3000/api/users';
   
   private friendsSubject = new BehaviorSubject<Friend[]>([]);
-  private friendRequestsSubject = new BehaviorSubject<FriendRequest[]>([]);
+  private incomingRequestsSubject = new BehaviorSubject<FriendRequest[]>([]);
+  private outgoingRequestsSubject = new BehaviorSubject<FriendRequest[]>([]);
   private recommendationsSubject = new BehaviorSubject<User[]>([]);
   
   friends$ = this.friendsSubject.asObservable();
-  friendRequests$ = this.friendRequestsSubject.asObservable();
+  incomingRequests$ = this.incomingRequestsSubject.asObservable();
+  outgoingRequests$ = this.outgoingRequestsSubject.asObservable();
   recommendations$ = this.recommendationsSubject.asObservable();
 
   constructor(
@@ -53,7 +55,8 @@ export class FriendsService {
     // Initialize data if user is logged in
     if (this.authService.isLoggedIn()) {
       this.loadFriendsList();
-      this.loadFriendRequests();
+      this.loadIncomingFriendRequests();
+      this.loadOutgoingFriendRequests();
       this.loadRecommendations();
     }
   }
@@ -73,14 +76,28 @@ export class FriendsService {
   }
 
   // Get incoming friend requests
-  loadFriendRequests(): void {
+  loadIncomingFriendRequests(): void {
     const userId = this.authService.getCurrentUserId();
     if (!userId) return;
 
-    this.http.get<FriendRequest[]>(`${this.apiUrl}/requests/${userId}`).pipe(
-      tap(requests => this.friendRequestsSubject.next(requests)),
+    this.http.get<FriendRequest[]>(`${this.apiUrl}/requests/incoming/${userId}`).pipe(
+      tap(requests => this.incomingRequestsSubject.next(requests)),
       catchError(error => {
-        console.error('Error loading friend requests:', error);
+        console.error('Error loading incoming friend requests:', error);
+        return of([]);
+      })
+    ).subscribe();
+  }
+
+  // Get outgoing friend requests
+  loadOutgoingFriendRequests(): void {
+    const userId = this.authService.getCurrentUserId();
+    if (!userId) return;
+
+    this.http.get<FriendRequest[]>(`${this.apiUrl}/requests/outgoing/${userId}`).pipe(
+      tap(requests => this.outgoingRequestsSubject.next(requests)),
+      catchError(error => {
+        console.error('Error loading outgoing friend requests:', error);
         return of([]);
       })
     ).subscribe();
@@ -94,10 +111,16 @@ export class FriendsService {
         const currentUserId = this.authService.getCurrentUserId();
         const currentFriends = this.friendsSubject.value.map(f => f.friendId);
         
-        // Filter out current user and existing friends
+        // Get IDs of users who have pending requests (both directions)
+        const incomingRequestUserIds = this.incomingRequestsSubject.value.map(r => r.senderId);
+        const outgoingRequestUserIds = this.outgoingRequestsSubject.value.map(r => r.receiverId);
+        
+        // Filter out current user, existing friends, and users with pending requests
         return users.filter(user => 
           user.id !== currentUserId && 
-          !currentFriends.includes(user.id!)
+          !currentFriends.includes(user.id!) &&
+          !incomingRequestUserIds.includes(user.id!) &&
+          !outgoingRequestUserIds.includes(user.id!)
         );
       }),
       tap(recommendations => {
@@ -129,9 +152,9 @@ export class FriendsService {
 
     return this.http.post(`${this.apiUrl}/request`, { senderId, receiverId }).pipe(
       tap(() => {
-        // Refresh recommendations and requests after sending
+        // Refresh after sending request
+        this.loadOutgoingFriendRequests();
         this.loadRecommendations();
-        this.loadFriendRequests();
       }),
       catchError(error => {
         console.error('Error sending friend request:', error);
@@ -144,9 +167,9 @@ export class FriendsService {
   acceptFriendRequest(requestId: number): Observable<any> {
     return this.http.put(`${this.apiUrl}/accept/${requestId}`, {}).pipe(
       tap(() => {
-        // Refresh both lists after accepting
+        // Refresh after accepting
         this.loadFriendsList();
-        this.loadFriendRequests();
+        this.loadIncomingFriendRequests();
       }),
       catchError(error => {
         console.error('Error accepting friend request:', error);
@@ -159,8 +182,9 @@ export class FriendsService {
   rejectFriendRequest(requestId: number): Observable<any> {
     return this.http.put(`${this.apiUrl}/reject/${requestId}`, {}).pipe(
       tap(() => {
-        // Refresh requests list after rejecting
-        this.loadFriendRequests();
+        // Refresh after rejecting
+        this.loadIncomingFriendRequests();
+        this.loadRecommendations(); // May want to recommend users whose requests were rejected
       }),
       catchError(error => {
         console.error('Error rejecting friend request:', error);
@@ -178,7 +202,7 @@ export class FriendsService {
       body: { userId, friendId }
     }).pipe(
       tap(() => {
-        // Refresh friends list and recommendations after removing
+        // Refresh after removing
         this.loadFriendsList();
         this.loadRecommendations();
       }),
@@ -199,13 +223,25 @@ export class FriendsService {
     );
   }
 
+  // Check if two users are friends
+  checkFriendship(friendId: number): Observable<boolean> {
+    const userId = this.authService.getCurrentUserId();
+    if (!userId) return of(false);
+
+    return this.http.get<boolean>(`${this.apiUrl}/check/${userId}/${friendId}`).pipe(
+      catchError(error => {
+        console.error('Error checking friendship status:', error);
+        return of(false);
+      })
+    );
+  }
+
   // Helper function to shuffle array for random recommendations
   private shuffleArray(array: any[]): any[] {
     for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
     }
     return array;
   }
-  
 }

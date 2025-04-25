@@ -1,0 +1,112 @@
+### 📝 Create a New Post
+POST http://localhost:3000/api/post
+Content-Type: application/json
+
+{
+  "userId": 1,
+  "content": "Hello world! 🌍",
+  "contentType": "text",
+  "mediaUrl": null
+}
+
+### ✏️ Update a Post
+PUT http://localhost:3000/api/post
+Content-Type: application/json
+
+{
+  "postId": 1,
+  "userId": 1,
+  "content": "Updated Post Content",
+  "contentType": "text",
+  "mediaUrl": null
+}
+
+### ❌ Delete a Post
+DELETE http://localhost:3000/api/post
+Content-Type: application/json
+
+{
+  "postId": 1,
+  "userId": 1
+}
+
+### 💬 Add a Comment
+POST http://localhost:3000/api/comment
+Content-Type: application/json
+
+{
+  "postId": 1,
+  "userId": 2,
+  "content": "Great post!",
+  "contentType": "text",
+  "mediaUrl": null
+}
+
+### ✏️ Update a Comment
+PUT http://localhost:3000/api/comment
+Content-Type: application/json
+
+{
+  "commentId": 1,
+  "userId": 2,
+  "content": "Edited my comment",
+  "contentType": "text",
+  "mediaUrl": null
+}
+
+### ❌ Delete a Comment
+DELETE http://localhost:3000/api/comment
+Content-Type: application/json
+
+{
+  "commentId": 1,
+  "userId": 2
+}
+
+### 🔍 Get Post with Comments
+GET http://localhost:3000/api/post/1
+
+### 🧩 Get User Timeline
+GET http://localhost:3000/api/timeline/1?page=1&pageSize=5
+
+### 📰 Get User Feed
+GET http://localhost:3000/api/feed/1?page=1&pageSize=5&includeCounselors=true
+
+### ✅ Get Recommended Counselors
+GET http://localhost:3000/api/analytics/recommended/5?limit=3
+
+
+### ✅ Search Users
+GET http://localhost:3000/api/analytics/search/5?query=therapist&userType=counselor&limit=10
+
+
+### ✅ Send Emoji Reaction
+POST http://localhost:3000/api/analytics/emoji/send
+Content-Type: application/json
+
+{
+  "userId": 5,
+  "contentType": "post",
+  "contentId": 23,
+  "emoji": "❤️"
+}
+
+
+### ✅ Get Emoji Reactions
+GET http://localhost:3000/api/analytics/emoji/reactions?contentType=post&contentId=23
+
+
+### ✅ Get User Activity Stats
+GET http://localhost:3000/api/analytics/activity/1
+
+
+### ✅ Get Mental Health Resources (with category)
+GET http://localhost:3000/api/analytics/resources?category=anxiety
+
+
+### ✅ Get Mental Health Resources (all)
+GET http://localhost:3000/api/analytics/resources
+
+
+### ✅ Find Similar Users
+GET http://localhost:3000/api/analytics/similar/5?limit=3

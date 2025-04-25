@@ -1,7 +1,15 @@
 export interface Post {
-    id: number;                              // Unique identifier for each post
-    user_id: number;                         // User who created the post (foreign key to Users)
-    content: string;                         // Content of the post
-    created_at: Date;                        // Timestamp when the post was created
-    updated_at: Date;                        // Timestamp when the post was last updated
-  }
+  id: number;
+  content: string;
+  content_type: string;
+  media_url: string | null;
+  created_at: Date;
+  updated_at: Date;
+  user_id: number;
+  user_name: string;
+  profile_image: string | null;
+  nickname: string | null;
+  comment_count: number;
+  is_counselor: boolean;
+  is_friend?: boolean;
+}

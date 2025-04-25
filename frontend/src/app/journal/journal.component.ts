@@ -217,10 +217,12 @@ export class JournalComponent implements OnInit {
           if (index !== -1) {
             this.journalEntries[index] = updatedEntry;
           }
-          this.successMessage = 'Journal entry updated successfully!';
-          this.clearForm();
-          this.loadJournalStatistics();
-          this.isLoading = false;
+          this.successMessage = 'Journal entry saved successfully!';
+this.clearForm();
+this.loadJournalStatistics();
+this.loadJournalEntries(); 
+this.isLoading = false;
+
         },
         error: (error) => {
           console.error('Update error:', error);

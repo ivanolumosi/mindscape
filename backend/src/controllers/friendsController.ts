@@ -10,19 +10,24 @@ const getErrorMessage = (err: unknown): string => {
 export const sendFriendRequest = async (req: Request, res: Response): Promise<void> => {
     try {
         const { senderId, receiverId } = req.body;
-        await friendsService.sendFriendRequest(senderId, receiverId);
-        res.status(201).json({ message: 'Friend request sent successfully' });
+        const friendRequest = await friendsService.sendFriendRequest(senderId, receiverId);
+        res.status(201).json({ 
+            message: 'Friend request sent successfully',
+            request: friendRequest
+        });
     } catch (err: unknown) {
         res.status(500).json({ error: getErrorMessage(err) });
     }
 };
-
 // ✅ Accept a Friend Request
 export const acceptFriendRequest = async (req: Request, res: Response): Promise<void> => {
     try {
         const requestId = parseInt(req.params.requestId, 10);
-        await friendsService.acceptFriendRequest(requestId);
-        res.status(200).json({ message: 'Friend request accepted' });
+        const updatedRequest = await friendsService.acceptFriendRequest(requestId);
+        res.status(200).json({ 
+            message: 'Friend request accepted',
+            request: updatedRequest
+        });
     } catch (err: unknown) {
         res.status(500).json({ error: getErrorMessage(err) });
     }

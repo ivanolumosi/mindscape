@@ -1,0 +1,178 @@
+### ✅ Get Recommended Counselors
+GET http://localhost:3000/api/analytics/recommended/5?limit=3
+Accept: application/json
+
+###
+
+### ✅ Search Users
+GET http://localhost:3000/api/analytics/search/5?query=therapist&userType=counselor&limit=10
+Accept: application/json
+
+###
+
+### ✅ Send Emoji Reaction
+POST http://localhost:3000/api/analytics/emoji/send
+Content-Type: application/json
+
+{
+  "userId": 5,
+  "contentType": "post",
+  "contentId": 23,
+  "emoji": "❤️"
+}
+
+###
+
+### ✅ Get Emoji Reactions
+GET http://localhost:3000/api/analytics/emoji/reactions?contentType=post&contentId=23
+Accept: application/json
+
+###
+
+### ✅ Get User Activity Stats
+GET http://localhost:3000/api/analytics/activity/1
+Accept: application/json
+
+###
+
+### ✅ Get Mental Health Resources (with category)
+GET http://localhost:3000/api/analytics/resources?category=anxiety
+Accept: application/json
+
+###
+
+### ✅ Get Mental Health Resources (all)
+GET http://localhost:3000/api/analytics/resources
+Accept: application/json
+
+###
+
+### ✅ Find Similar Users
+GET http://localhost:3000/api/analytics/similar/5?limit=3
+Accept: application/json
+
+###
+
+### 👥 Get All Seekers
+GET http://localhost:3000/api/analytics/seekers
+Accept: application/json
+
+###
+
+### 👥 Create Seeker
+POST http://localhost:3000/api/analytics/seekers
+Content-Type: application/json
+
+{
+  "name": "Jane Doe",
+  "email": "jane@example.com",
+  "password": "secure123",
+  "faculty": "Engineering"
+}
+
+###
+
+### 👥 Update Seeker
+PUT http://localhost:3000/api/analytics/seekers/2
+Content-Type: application/json
+
+{
+  "name": "Jane Updated",
+  "email": "jane.updated@example.com",
+  "faculty": "Health Sciences"
+}
+
+###
+
+### 👥 Delete Seeker
+DELETE http://localhost:3000/api/analytics/seekers/2
+Accept: application/json
+
+###
+
+### 💬 Send Message to Seeker
+POST http://localhost:3000/api/analytics/messages/send
+Content-Type: application/json
+
+{
+  "senderId": 3,
+  "receiverId": 8,
+  "content": "Hi there!"
+}
+
+###
+
+### 💬 View Messages
+GET http://localhost:3000/api/analytics/messages/3/8
+Accept: application/json
+
+###
+
+### 💬 Mark Message as Read
+PATCH http://localhost:3000/api/analytics/messages/15/read
+Accept: application/json
+
+###
+
+### 🕒 Set Counselor Availability
+POST http://localhost:3000/api/analytics/availability
+Content-Type: application/json
+
+{
+  "counselorId": 3,
+  "day": "Monday",
+  "startTime": "09:00",
+  "endTime": "12:00"
+}
+
+###
+
+### 🕒 Check Slot Availability
+POST http://localhost:3000/api/analytics/availability/check
+Content-Type: application/json
+
+{
+  "counselorId": 3,
+  "date": "2025-04-30",
+  "startTime": "10:00",
+  "endTime": "11:00"
+}
+
+###
+
+### 📅 Schedule Session
+POST http://localhost:3000/api/analytics/sessions
+Content-Type: application/json
+
+{
+  "counselorId": 3,
+  "title": "1-on-1 Session",
+  "venue": "Room 101",
+  "date": "2025-05-02",
+  "startTime": "10:00",
+  "endTime": "11:00",
+  "description": "Discussion about anxiety and coping strategies.",
+  "maxParticipants": 1
+}
+
+###
+
+### 📅 View Counselor Sessions
+GET http://localhost:3000/api/analytics/sessions/3
+Accept: application/json
+
+###
+
+### 📅 Cancel Session
+DELETE http://localhost:3000/api/analytics/sessions/12
+Content-Type: application/json
+
+{
+  "counselorId": 3
+}
+
+###
+
+### 📅 Get Weekly Timetable
+GET http://localhost:3000/api/analytics/timetable/3
+Accept: application/json

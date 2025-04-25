@@ -6,71 +6,16 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
 class AuthService {
-    // Login user and generate JWT token
-    async login(email: string, password: string): Promise<string> {
+    // Auto-add counselors as friends for new users
+    private async autoAddCounselors(userId: number): Promise<void> {
         try {
-            // Validate input
-            if (!email || !password) {
-                throw new Error('Email and password are required');
-            }
-
-            // Prepare connection
             const pool = await poolPromise;
-            const request = pool.request();
-
-            // Find user by email
-            request.input('email', sql.NVarChar, email);
-            const result = await request.query(
-                `SELECT * FROM Users WHERE email = @email`
-            );
-
-            // Check if user exists
-            if (result.recordset.length === 0) {
-                throw new Error('No account found with this email');
-            }
-
-            const user = result.recordset[0];
-
-            // Verify password
-            const isPasswordValid = await bcrypt.compare(
-                password, 
-                user.password
-            );
-
-            if (!isPasswordValid) {
-                throw new Error('Incorrect password');
-            }
-
-            // Generate JWT token
-            const token = jwt.sign(
-                { 
-                    id: user.id, 
-                    email: user.email, 
-                    role: user.role 
-                },
-                process.env.JWT_SECRET || 'your_jwt_secret',
-                { expiresIn: '24h' }
-            );
-
-            return token;
+            await pool.request()
+                .input('NewUserId', sql.Int, userId)
+                .execute('AutoAddCounselorFriends');
         } catch (error) {
-            console.error('Login error:', error);
-            
-            // Provide more specific error messages
-            if (error instanceof Error) {
-                switch (error.message) {
-                    case 'No account found with this email':
-                        throw new Error('No account found with this email address');
-                    case 'Incorrect password':
-                        throw new Error('Invalid email or password');
-                    case 'Email and password are required':
-                        throw new Error('Email and password are required');
-                    default:
-                        throw new Error('Unable to complete login');
-                }
-            }
-            
-            throw new Error('Login process failed');
+            console.error('Failed to auto-add counselor friends:', error);
+            // Optional: don't block registration if this fails
         }
     }
 
@@ -113,8 +58,12 @@ class AuthService {
                 throw new Error(result.recordset[0].ErrorMessage);
             }
 
-            // Return the newly created user's ID
-            return result.recordset[0].id;
+            // Get the newly created user's ID
+            const newUserId = result.recordset[0].id;
+            // Auto-add counselors after registration
+            await this.autoAddCounselors(newUserId);
+
+            return newUserId;
         } catch (error) {
             console.error('Registration error:', error);
             
@@ -134,6 +83,74 @@ class AuthService {
             }
             
             throw new Error('Registration process failed');
+        }
+    }
+
+    // Login user and generate JWT token
+    async login(email: string, password: string): Promise<{ token: string; user: any }> {
+        try {
+            // Validate input
+            if (!email || !password) {
+                throw new Error('Email and password are required');
+            }
+
+            const pool = await poolPromise;
+            const request = pool.request();
+
+            // Find user by email
+            request.input('email', sql.NVarChar, email);
+            const result = await request.query(`SELECT * FROM Users WHERE email = @email`);
+
+            if (result.recordset.length === 0) {
+                throw new Error('No account found with this email');
+            }
+
+            const user = result.recordset[0];
+
+            // Verify password
+            const isPasswordValid = await bcrypt.compare(password, user.password);
+            if (!isPasswordValid) {
+                throw new Error('Incorrect password');
+            }
+
+            // Generate token
+            const token = jwt.sign(
+                {
+                    id: user.id,
+                    email: user.email,
+                    role: user.role
+                },
+                process.env.JWT_SECRET || 'your_jwt_secret',
+                { expiresIn: '24h' }
+            );
+
+            // Remove sensitive fields from user object before returning
+            const { password: _, ...userWithoutPassword } = user;
+
+            // Auto-add counselors after login (optional but helps ensure older accounts are auto-friended)
+            await this.autoAddCounselors(user.id);
+
+            return {
+                token,
+                user: userWithoutPassword
+            };
+        } catch (error) {
+            console.error('Login error:', error);
+
+            if (error instanceof Error) {
+                switch (error.message) {
+                    case 'No account found with this email':
+                        throw new Error('No account found with this email address');
+                    case 'Incorrect password':
+                        throw new Error('Invalid email or password');
+                    case 'Email and password are required':
+                        throw new Error('Email and password are required');
+                    default:
+                        throw new Error('Unable to complete login');
+                }
+            }
+
+            throw new Error('Login process failed');
         }
     }
 
@@ -176,6 +193,8 @@ class AuthService {
         const complexityRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
         return complexityRegex.test(password);
     }
+
+  
     async getProfileDetails(userId: number): Promise<any> { // 🚫 No role here
         try {
             const pool = await poolPromise;
@@ -263,6 +282,21 @@ async updateUserRole(userId: number, newRole: string): Promise<void> {
     }
 }
 
+// Upload and update profile image for a user
+async uploadProfileImage(userId: number, imagePath: string): Promise<void> {
+    try {
+        const pool = await poolPromise;
+        const request = pool.request();
+
+        request.input('UserId', sql.Int, userId);
+        request.input('ProfileImage', sql.NVarChar, imagePath); // Path to saved image (e.g., URL or local path)
+
+        await request.execute('UpdateUserProfileImage');
+    } catch (error) {
+        console.error('Service - Upload Profile Image Error:', error);
+        throw new Error('Failed to upload profile image');
+    }
+}
 
 }
 

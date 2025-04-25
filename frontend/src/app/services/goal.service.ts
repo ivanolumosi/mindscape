@@ -4,6 +4,10 @@ import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
 
 export interface Goal {
+title: any;
+user_name: any;
+target_date: string|Date;
+description: any;
   id?: number;
   user_id?: number;
   goal_title: string;

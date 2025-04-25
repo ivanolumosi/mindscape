@@ -27,7 +27,6 @@ GET http://localhost:3000/api/moods/user/1/stats
 PATCH http://localhost:3000/api/moods/2
 Content-Type: application/json
 
-{
-  "mood": "Excited",
-  "notes": "Looking forward to my trip!"
-}
+###debugging
+
+GET http://localhost:3000/api/debug/db-info

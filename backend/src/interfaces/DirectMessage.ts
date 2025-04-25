@@ -1,11 +1,20 @@
 export interface DirectMessage {
-    id: number;                     // Unique identifier for each message
-    sender_id: number;              // The user who sent the message
-    receiver_id: number;            // The user who received the message
-    content: string;                // The content of the message
-    parent_message_id?: number;    // ID of the parent message (if the message is a reply)
-    is_read: boolean;               // Whether the message has been read (0 = unread, 1 = read)
-    created_at: Date;               // Timestamp when the message was sent
-    updated_at: Date;               // Timestamp when the message was last updated
-  }
+  id: number;
+  sender_id: number;
+  receiver_id: number;
+  content: string;
+  content_type: string;
+  media_url?: string;
+  parent_message_id?: number;
+  is_read: boolean;
+  is_edited: boolean;
+  created_at: Date;
+  updated_at: Date;
   
+  // Fields returned by sp_GetChatHistory
+  sender_name?: string;
+  sender_image?: string;
+  receiver_name?: string;
+  receiver_image?: string;
+  is_sender_counselor?: boolean;
+}

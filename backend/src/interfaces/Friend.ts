@@ -1,7 +1,12 @@
 export interface Friend {
-    id: number;           // Unique identifier for the friendship
-    user_id: number;      // The ID of the first user
-    friend_id: number;    // The ID of the second user (friend)
-    created_at: Date;     // Timestamp when the friendship was created
-  }
-  
+  friendship_id: number;
+  friend_id: number;
+  friend_name: string;
+  email: string;
+  role: 'seeker' | 'counselor' | 'admin';
+  profile_image?: string | null;
+  nickname?: string | null;
+  specialization?: string | null;
+  created_at: Date;
+  is_counselor: boolean;
+}

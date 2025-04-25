@@ -4,6 +4,8 @@ import { map, Observable } from 'rxjs';
 import { AuthService } from './auth.service';
 
 export interface DailyJournal {
+content: any;
+user_name: any;
   id?: number;
   user_id: number;
   entry_date: string | null; // Changed to allow null
@@ -110,16 +112,17 @@ export class JournalService {
   
   private processEntryDate(entry: any): DailyJournal {
     if (!entry) {
-      // Return a default entry if null/undefined
       return {
         user_id: 0,
         entry_date: '',
         mood: '',
         reflections: '',
-        gratitude: ''
+        gratitude: '',
+        content: '',
+        user_name: ''
       };
     }
-    
+  
     return {
       id: entry.id,
       user_id: entry.user_id || 0,
@@ -128,7 +131,9 @@ export class JournalService {
       reflections: entry.reflections || '',
       gratitude: entry.gratitude || '',
       created_at: entry.created_at || null,
-      updated_at: entry.updated_at || null
+      updated_at: entry.updated_at || null,
+      content: entry.content || '',
+      user_name: entry.user_name || ''
     };
   }
-}
+}  

@@ -14,6 +14,7 @@ export interface BaseUser {
   profileImage?: string;
   role: 'seeker' | 'counselor' | 'admin';
   isProfileComplete?: boolean;
+
   
 }
 
@@ -176,7 +177,30 @@ export class ProfileService {
       })
     );
   }
-
+  uploadProfileImage(file: File): Observable<User> {
+    const currentUser = this.userSubject.value;
+    if (!currentUser || (!currentUser.id && !currentUser.userId)) {
+      throw new Error('No user available for uploading image.');
+    }
+  
+    const userId = currentUser.userId || currentUser.id; // Either one
+    
+    const formData = new FormData();
+    formData.append('file', file);
+  
+    return this.http.post<User>(`${this.apiUrl}/upload-profile-image?userId=${userId}`, formData).pipe(
+      tap((updatedUser: User) => {
+        this.userSubject.next(updatedUser);
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+      }),
+      catchError(error => {
+        console.error('Error uploading profile image:', error);
+        throw error;
+      })
+    );
+  }
+  
   getCurrentUser(): User | null {
     return this.userSubject.value;
   }

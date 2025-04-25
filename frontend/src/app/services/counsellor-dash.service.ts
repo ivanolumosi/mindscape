@@ -1,196 +1,309 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable, forkJoin, map, of } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+
+import { AuthService } from './auth.service';
+import { ProfileService, User } from './profile.service';
+import { JournalService, DailyJournal } from './journal.service';
+import { FriendsService, Friend } from './friends.service';
+import { ChatAppService } from './chat-app.service';
+import { MoodService, MoodTracker, MoodStatistic } from './mood.service';
+import { GoalService, Goal } from './goal.service';
+import { UserService } from './user.service';
+
+import { Post } from '../interfaces/PostModel';
+import { Comment } from '../interfaces/comment';
+import { DirectMessage } from '../interfaces/Direct_messages';
+
+export interface CounsellorDashboardData {
+  totalUsers: number;
+  totalJournalEntries: number;
+  totalMoodEntries: number;
+  totalGoals: number;
+  moodDistribution: MoodStatistic[];
+  recentUsers: User[];
+}
+
+export interface StudentProgressData {
+  journals: DailyJournal[];
+  moods: MoodTracker[];
+  goals: Goal[];
+  posts: Post[];
+  messages: DirectMessage[];
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class CounsellorDashService {
-  constructor() { }
+  private apiUrl = 'http://localhost:3000/api/counsellor';
+  private analyticsApi = 'http://localhost:3000/api/analytics';
 
-  // These methods would typically connect to your backend API
-  // For now, they return mock data for UI development purposes
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService,
+    private profileService: ProfileService,
+    private journalService: JournalService,
+    private friendsService: FriendsService,
+    private chatAppService: ChatAppService,
+    private moodService: MoodService,
+    private goalService: GoalService,
+    private userService: UserService
+  ) {}
 
-  getDashboardStats(): Observable<any> {
-    return of({
-      totalAppointmentsToday: 5,
-      activeClients: 24,
-      pendingAssessments: 8
+  // -------------------------
+  // Availability Management
+  // -------------------------
+
+  setCounselorAvailability(
+    counselorId: number,
+    day: string,
+    startTime: string,
+    endTime: string
+  ): Observable<any> {
+    return this.http.post(`${this.analyticsApi}/availability`, {
+      counselorId, day, startTime, endTime
     });
   }
 
-  getTodaySchedule(): Observable<any[]> {
-    return of([
-      {
-        startTime: '10:00 AM',
-        endTime: '11:00 AM',
-        duration: '60 min',
-        clientName: 'John Doe',
-        clientPhoto: 'assets/clients/client1.jpg',
-        sessionType: 'Initial Assessment',
-        status: 'completed'
-      },
-      {
-        startTime: '12:00 PM',
-        endTime: '1:00 PM',
-        duration: '60 min',
-        clientName: 'Emma Johnson',
-        clientPhoto: 'assets/clients/client2.jpg',
-        sessionType: 'Weekly Session',
-        status: 'completed'
-      },
-      {
-        startTime: '2:00 PM',
-        endTime: '3:00 PM',
-        duration: '60 min',
-        clientName: 'Michael Smith',
-        clientPhoto: 'assets/clients/client3.jpg',
-        sessionType: 'Anxiety Management',
-        status: 'upcoming'
-      },
-      {
-        startTime: '4:00 PM',
-        endTime: '5:00 PM',
-        duration: '60 min',
-        clientName: 'Sophia Williams',
-        clientPhoto: 'assets/clients/client4.jpg',
-        sessionType: 'Family Therapy',
-        status: 'upcoming'
-      }
-    ]);
+  checkSlotAvailability(
+    counselorId: number,
+    date: string,
+    startTime: string,
+    endTime: string
+  ): Observable<any> {
+    return this.http.post(`${this.analyticsApi}/availability/check`, {
+      counselorId, date, startTime, endTime
+    });
   }
 
-  getClientMoodData(): Observable<any> {
-    return of({
-      labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-      datasets: [
-        {
-          label: 'Great',
-          data: [5, 3, 4, 7],
-          borderColor: '#4CAF50'
-        },
-        {
-          label: 'Good',
-          data: [12, 15, 13, 10],
-          borderColor: '#8BC34A'
-        },
-        {
-          label: 'Okay',
-          data: [8, 7, 9, 6],
-          borderColor: '#FFC107'
-        },
-        {
-          label: 'Down',
-          data: [3, 4, 2, 1],
-          borderColor: '#FF9800'
-        },
-        {
-          label: 'Bad',
-          data: [2, 1, 2, 0],
-          borderColor: '#F44336'
+  // -------------------------
+  // Session Management
+  // -------------------------
+
+  scheduleSession(sessionData: {
+    counselorId: number;
+    title: string;
+    venue: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+    description: string;
+    maxParticipants: number;
+  }): Observable<any> {
+    return this.http.post(`${this.analyticsApi}/sessions`, sessionData);
+  }
+
+  viewCounselorSessions(counselorId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.analyticsApi}/sessions/${counselorId}`);
+  }
+
+  cancelSession(sessionId: number, counselorId: number): Observable<any> {
+    return this.http.request('delete', `${this.analyticsApi}/sessions/${sessionId}`, {
+      body: { counselorId }
+    });
+  }
+
+  getWeeklyTimetable(counselorId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.analyticsApi}/timetable/${counselorId}`);
+  }
+
+  // -------------------------
+  // Message Management
+  // -------------------------
+
+  sendMessageToStudent(senderId: number, receiverId: number, content: string): Observable<DirectMessage> {
+    return this.http.post<DirectMessage>(`${this.analyticsApi}/messages/send`, {
+      senderId, receiverId, content
+    });
+  }
+
+  getConversationWithStudent(counselorId: number, seekerId: number): Observable<DirectMessage[]> {
+    return this.http.get<DirectMessage[]>(`${this.analyticsApi}/messages/${counselorId}/${seekerId}`);
+  }
+
+  markMessageAsRead(messageId: number): Observable<void> {
+    return this.http.patch<void>(`${this.analyticsApi}/messages/${messageId}/read`, {});
+  }
+
+  // -------------------------
+  // Core User Management
+  // -------------------------
+
+  getAllStudents(): Observable<User[]> {
+    return this.userService.getUsersByRole('student');
+  }
+
+  getStudentsByFaculty(faculty: string): Observable<User[]> {
+    return this.userService.getUsersByFaculty(faculty);
+  }
+
+  getStudentProfile(userId: number): Observable<User> {
+    return this.profileService.getUserProfile(userId);
+  }
+
+  updateStudentProfile(userId: number, profileData: Partial<User>): Observable<User> {
+    return this.userService.updateUser(userId, profileData);
+  }
+
+  // -------------------------
+  // Journal Management
+  // -------------------------
+
+  getStudentJournals(userId: number): Observable<DailyJournal[]> {
+    return this.journalService.getJournalEntriesByUser(userId);
+  }
+
+  getStudentJournalsByDateRange(userId: number, startDate: string, endDate: string): Observable<DailyJournal[]> {
+    return this.journalService.getJournalEntriesByDateRange(userId, startDate, endDate);
+  }
+
+  getStudentJournalStatistics(userId: number): Observable<{ TotalEntries: number; FirstEntryDate: string | null; LastEntryDate: string | null }> {
+    return this.journalService.getJournalStatistics(userId);
+  }
+
+  getJournalEntry(entryId: number): Observable<DailyJournal> {
+    return this.journalService.getJournalEntryById(entryId);
+  }
+
+  getAllJournalEntries(): Observable<DailyJournal[]> {
+    return this.journalService.getAllJournalEntries();
+  }
+
+  // -------------------------
+  // Mood Tracking
+  // -------------------------
+
+  getStudentMoods(userId: number): Observable<MoodTracker[]> {
+    return this.http.get<MoodTracker[]>(`http://localhost:3000/api/moods/user/${userId}`).pipe(
+      map(moods => moods.map(mood => ({
+        ...mood,
+        recorded_at: new Date(mood.recorded_at)
+      })))
+    );
+  }
+
+  getStudentMoodStatistics(userId: number): Observable<MoodStatistic[]> {
+    return this.http.get<MoodStatistic[]>(`http://localhost:3000/api/moods/user/${userId}/stats`);
+  }
+
+  getStudentMoodsByDateRange(userId: number, startDate: Date, endDate: Date): Observable<MoodTracker[]> {
+    return this.http.get<MoodTracker[]>(
+      `http://localhost:3000/api/moods/user/${userId}/date-range`, {
+        params: {
+          startDate: startDate.toISOString().split('T')[0],
+          endDate: endDate.toISOString().split('T')[0]
         }
-      ]
+      }
+    ).pipe(
+      map(moods => moods.map(mood => ({
+        ...mood,
+        recorded_at: new Date(mood.recorded_at)
+      })))
+    );
+  }
+
+  getMoodOptions(): string[] {
+    return this.moodService.getMoodOptions();
+  }
+
+  // -------------------------
+  // Goals
+  // -------------------------
+
+  getStudentGoals(userId: number): Observable<Goal[]> {
+    return this.http.get<Goal[]>(`http://localhost:3000/api/goals/user/${userId}`);
+  }
+
+  getStudentGoalsByStatus(userId: number, isCompleted: boolean): Observable<Goal[]> {
+    return this.http.get<Goal[]>(
+      `http://localhost:3000/api/goals/user/${userId}/status?isCompleted=${isCompleted}`
+    );
+  }
+
+  getGoalDetails(goalId: number): Observable<Goal> {
+    return this.goalService.getGoalById(goalId);
+  }
+
+  updateStudentGoalStatus(goalId: number, isCompleted: boolean, progressPercentage: number): Observable<Goal> {
+    return this.goalService.updateGoalStatus(goalId, isCompleted, progressPercentage);
+  }
+
+  // -------------------------
+  // Community (Posts & Comments)
+  // -------------------------
+
+  getAllCommunityPosts(): Observable<Post[]> {
+    return this.chatAppService.getAllPosts();
+  }
+
+  createCommunityPost(content: string): Observable<Post> {
+    return this.chatAppService.createPost(content);
+  }
+
+  getCommentsForPost(postId: number): Observable<Comment[]> {
+    return this.chatAppService.getCommentsByPost(postId);
+  }
+
+  addCommentToPost(postId: number, content: string): Observable<Comment> {
+    return this.chatAppService.addComment(postId, content);
+  }
+
+  // -------------------------
+  // Reports & Dashboard
+  // -------------------------
+
+  getDashboardData(): Observable<CounsellorDashboardData> {
+    return forkJoin({
+      users: this.userService.getUsersByRole('student'),
+      journals: this.journalService.getAllJournalEntries(),
+      moods: this.http.get<MoodTracker[]>('http://localhost:3000/api/moods/all'),
+      goals: this.http.get<Goal[]>('http://localhost:3000/api/goals/all'),
+      moodStats: this.http.get<MoodStatistic[]>('http://localhost:3000/api/moods/stats/all')
+    }).pipe(
+      map(results => ({
+        totalUsers: results.users.length,
+        totalJournalEntries: results.journals.length,
+        totalMoodEntries: results.moods.length,
+        totalGoals: results.goals.length,
+        moodDistribution: results.moodStats,
+        recentUsers: results.users.slice(0, 5)
+      }))
+    );
+  }
+
+  getStudentProgressData(studentId: number): Observable<StudentProgressData> {
+    return forkJoin({
+      journals: this.getStudentJournals(studentId),
+      moods: this.getStudentMoods(studentId),
+      goals: this.getStudentGoals(studentId),
+      posts: this.http.get<Post[]>(`http://localhost:3000/api/chat/posts/user/${studentId}`),
+      messages: this.getConversationWithStudent(studentId, studentId)
     });
   }
 
-  getRecentMessages(): Observable<any[]> {
-    return of([
-      {
-        senderName: 'John Doe',
-        senderPhoto: 'assets/clients/client1.jpg',
-        time: '10:30 AM',
-        preview: 'Thank you for our session earlier today. I wanted to follow up about the resources you mentioned...',
-        read: false
-      },
-      {
-        senderName: 'Emma Johnson',
-        senderPhoto: 'assets/clients/client2.jpg',
-        time: '9:15 AM',
-        preview: 'Ive been practicing the mindfulness exercises we discussed and Im starting to notice some improvements...',
-        read: false
-      },
-      {
-        senderName: 'Dr. Robert Chen',
-        senderPhoto: 'assets/team/doctor1.jpg',
-        time: 'Yesterday',
-        preview: 'Im referring a new client to you who might benefit from your approach. Are you accepting new clients?',
-        read: true
-      }
-    ]);
+  generateStudentReport(studentId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/reports/student/${studentId}`);
   }
 
-  getSupportGroups(): Observable<any[]> {
-    return of([
-      {
-        name: 'Anxiety Support Group',
-        icon: 'fa fa-users',
-        schedule: 'Wednesdays at 5:00 PM',
-        totalMembers: 12,
-        memberPreviews: [
-          { photo: 'assets/clients/client1.jpg' },
-          { photo: 'assets/clients/client2.jpg' },
-          { photo: 'assets/clients/client3.jpg' }
-        ]
-      },
-      {
-        name: 'Grief & Loss',
-        icon: 'fa fa-heart',
-        schedule: 'Mondays at 6:00 PM',
-        totalMembers: 8,
-        memberPreviews: [
-          { photo: 'assets/clients/client4.jpg' },
-          { photo: 'assets/clients/client5.jpg' },
-          { photo: 'assets/clients/client6.jpg' }
-        ]
-      }
-    ]);
+  generateSummaryReport(facultyFilter?: string): Observable<any> {
+    let url = `${this.apiUrl}/reports/summary`;
+    if (facultyFilter) {
+      url += `?faculty=${encodeURIComponent(facultyFilter)}`;
+    }
+    return this.http.get(url);
   }
 
-  getClientProgress(): Observable<any[]> {
-    return of([
-      {
-        name: 'John Doe',
-        photo: 'assets/clients/client1.jpg',
-        focusArea: 'Anxiety Management',
-        progressPercentage: 75
-      },
-      {
-        name: 'Emma Johnson',
-        photo: 'assets/clients/client2.jpg',
-        focusArea: 'Depression',
-        progressPercentage: 60
-      },
-      {
-        name: 'Michael Smith',
-        photo: 'assets/clients/client3.jpg',
-        focusArea: 'Stress Reduction',
-        progressPercentage: 40
-      }
-    ]);
-  }
+  // -------------------------
+  // Utility
+  // -------------------------
 
-  getAssessmentsDue(): Observable<any[]> {
-    return of([
-      {
-        clientName: 'Sophia Williams',
-        clientPhoto: 'assets/clients/client4.jpg',
-        assessmentType: 'GAD-7 Anxiety',
-        dueDate: 'March 20, 2025',
-        status: 'upcoming'
-      },
-      {
-        clientName: 'Emma Johnson',
-        clientPhoto: 'assets/clients/client2.jpg',
-        assessmentType: 'PHQ-9 Depression',
-        dueDate: 'Today',
-        status: 'today'
-      },
-      {
-        clientName: 'Michael Smith',
-        clientPhoto: 'assets/clients/client3.jpg',
-        assessmentType: 'Quality of Life',
-        dueDate: 'March 15, 2025',
-        status: 'overdue'
-      }
-    ]);
+  isCounselor(): Observable<boolean> {
+    const userId = this.authService.getCurrentUserId();
+    if (!userId) return of(false);
+
+    return this.profileService.getUserProfile(userId).pipe(
+      map(user => user.role === 'counselor')
+    );
   }
 }

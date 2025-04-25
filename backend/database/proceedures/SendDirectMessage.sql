@@ -1,4 +1,4 @@
-ALTER PROCEDURE SendDirectMessage
+CREATE PROCEDURE SendDirectMessage
     @sender_id INT,
     @receiver_id INT,
     @content NVARCHAR(MAX)

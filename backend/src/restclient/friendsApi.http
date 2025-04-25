@@ -4,7 +4,7 @@ Content-Type: application/json
 
 {
   "senderId": 1011,
-  "receiverId": 1012
+  "receiverId": 7019
 }
 
 ### ✅ Send a Friend Request (Alice to Kelvin)
@@ -12,8 +12,9 @@ POST http://localhost:3000/api/friends/request
 Content-Type: application/json
 
 {
-  "senderId": 1012,
-  "receiverId": 1011
+  "senderId": 7019,
+  "receiverId":8019
+
 }
 
 ### ✅ Accept Friend Request (Assume request ID is 5, update if needed)
@@ -32,7 +33,7 @@ Content-Type: application/json
 }
 
 ### ✅ Get Friend List (Kelvin)
-GET http://localhost:3000/api/friends/list/1011
+GET http://localhost:3000/api/friends/list/7019
 
 ### ✅ Get Friend List (Alice)
 GET http://localhost:3000/api/friends/list/1012

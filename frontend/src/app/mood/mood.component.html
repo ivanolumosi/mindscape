@@ -1,1 +1,88 @@
-<p>mood works!</p>
+<!-- mood-tracker.component.html -->
+<div class="mood-tracker-container">
+  <app-sidebar></app-sidebar>
+    <h2>Mood Tracker</h2>
+    
+    <!-- Mood Entry Form -->
+    <div class="mood-form-card">
+      <h3>How are you feeling today?</h3>
+      <form [formGroup]="moodForm" (ngSubmit)="submitMood()">
+        <div class="form-group">
+          <label for="mood">Select Mood:</label>
+          <select id="mood" formControlName="mood" class="form-control">
+            <option value="" disabled>Choose a mood</option>
+            <option *ngFor="let option of moodOptions" [value]="option">{{ option }}</option>
+          </select>
+          <div *ngIf="moodForm.get('mood')?.invalid && moodForm.get('mood')?.touched" class="error-message">
+            Please select a mood
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="notes">Notes (optional):</label>
+          <textarea id="notes" formControlName="notes" rows="3" class="form-control" 
+                   placeholder="Add notes about your mood..."></textarea>
+        </div>
+        
+        <button type="submit" [disabled]="moodForm.invalid" class="btn btn-primary">
+          Track My Mood
+        </button>
+      </form>
+    </div>
+    
+    <!-- Mood Statistics -->
+    <div class="mood-stats-card">
+      <h3>Your Mood Patterns</h3>
+      <div *ngIf="moodStats.length" class="mood-stats">
+        <div *ngFor="let stat of moodStats" class="mood-stat-item">
+          <span class="mood-name">{{ stat.mood }}</span>
+          <span class="mood-count">{{ stat.mood_count }}</span>
+          <div class="stat-bar" [style.width.%]="(stat.mood_count / moodStats[0].mood_count) * 100"></div>
+        </div>
+      </div>
+      <div *ngIf="!moodStats.length" class="no-data">
+        No mood data available yet
+      </div>
+    </div>
+    
+    <!-- Date Range Filter -->
+    <div class="filter-card">
+      <h3>Filter by Date</h3>
+      <div class="date-range-picker">
+        <div class="form-group">
+          <label for="startDate">Start Date:</label>
+          <input type="date" id="startDate" [value]="dateRange.startDate.toISOString().split('T')[0]" 
+                 #startDateInput class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="endDate">End Date:</label>
+          <input type="date" id="endDate" [value]="dateRange.endDate.toISOString().split('T')[0]" 
+                 #endDateInput class="form-control">
+        </div>
+        <button (click)="updateDateRange(startDateInput.value, endDateInput.value)" class="btn btn-secondary">
+          Apply Filter
+        </button>
+      </div>
+    </div>
+  
+    <!-- Mood History -->
+    <div class="mood-history-card">
+      <h3>Your Mood History</h3>
+      <div *ngIf="isLoading" class="loading">Loading mood entries...</div>
+      
+      <div *ngIf="!isLoading && userMoods.length" class="mood-history">
+        <div *ngFor="let entry of userMoods" class="mood-entry">
+          <div class="mood-header">
+            <span class="mood-badge" [ngClass]="'mood-' + entry.mood.toLowerCase()">{{ entry.mood }}</span>
+            <span class="mood-date">{{ formatDate(entry.recorded_at) }}</span>
+            <button class="delete-btn" (click)="deleteMood(entry.id!)">×</button>
+          </div>
+          <p *ngIf="entry.notes" class="mood-notes">{{ entry.notes }}</p>
+        </div>
+      </div>
+      
+      <div *ngIf="!isLoading && !userMoods.length" class="no-data">
+        No mood entries found
+      </div>
+    </div>
+  </div>

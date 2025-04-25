@@ -7,16 +7,17 @@
   
     <!-- Desktop Navigation -->
     <nav class="nav-links">
-      <a href="#" class="nav-link">Home</a>
-      <a href="#" class="nav-link">Services</a>
-      <a href="#" class="nav-link">About</a>
-      <a href="#" class="nav-link">Resources</a>
-      <a href="#" class="nav-link">Contact</a>
+      <a href="#" class="nav-link active">Home</a>
+      <a href="#services" class="nav-link">Services</a>
+      <a href="#about" class="nav-link">About</a>
+      <a href="#resources" class="nav-link">Resources</a>
+      <a href="#contact" class="nav-link">Contact</a>
     </nav>
   
     <div class="auth-buttons">
-      <button class="btn btn-outline">Login</button>
-      <button class="btn btn-primary">Get Started</button>
+      <button *ngIf="!isLoggedIn" class="btn btn-outline" (click)="login()">Login</button>
+      <button *ngIf="!isLoggedIn" class="btn btn-primary" (click)="getStarted()">Get Started</button>
+      <button *ngIf="isLoggedIn" class="btn btn-primary" (click)="goToDashboard()">Dashboard</button>
     </div>
   
     <!-- Mobile Menu Toggle Button -->
@@ -25,164 +26,246 @@
       <span [class.open]="isMenuOpen"></span>
       <span [class.open]="isMenuOpen"></span>
     </div>
-  
-    <!-- Mobile Navigation Menu -->
-    <div class="mobile-menu" *ngIf="isMenuOpen">
-      <a href="#" class="nav-link">Home</a>
-      <a href="#" class="nav-link">Services</a>
-      <a href="#" class="nav-link">About</a>
-      <a href="#" class="nav-link">Resources</a>
-      <a href="#" class="nav-link">Contact</a>
-  
-      <div class="mobile-auth">
-        <button class="btn btn-outline">Login</button>
-        <button class="btn btn-primary">Get Started</button>
-      </div>
-    </div>
   </header>
   
+  <!-- Mobile Navigation Menu -->
+  <div class="mobile-menu" [class.active]="isMenuOpen">
+    <a href="#" class="nav-link">Home</a>
+    <a href="#services" class="nav-link">Services</a>
+    <a href="#about" class="nav-link">About</a>
+    <a href="#resources" class="nav-link">Resources</a>
+    <a href="#contact" class="nav-link">Contact</a>
+
+    <div class="mobile-auth">
+      <button *ngIf="!isLoggedIn" class="btn btn-outline" (click)="login()">Login</button>
+      <button *ngIf="!isLoggedIn" class="btn btn-primary" (click)="getStarted()">Get Started</button>
+      <button *ngIf="isLoggedIn" class="btn btn-primary" (click)="goToDashboard()">Dashboard</button>
+    </div>
+  </div>
+  
+  <!-- Personalized Welcome Banner (When Logged In) -->
+  <div *ngIf="isLoggedIn" class="welcome-banner">
+    <div class="container">
+      <div class="welcome-content">
+        <h2>{{userGreeting}}</h2>
+        <p>Continue your mental wellness journey today.</p>
+        <button class="btn btn-primary" (click)="goToDashboard()">Go to Dashboard</button>
+      </div>
+    </div>
+  </div>
   
   <!-- Hero Section -->
   <section class="hero-section">
     <div class="hero-content">
       <h1 class="hero-title">Your mental wellbeing matters at Chuka University</h1>
       <p class="hero-subtitle">Join over 5,000 students who decided to get help and get happy with Mindscape.</p>
-      <button class="btn btn-primary">Get Started</button>
+      <div class="hero-buttons">
+        <button class="btn btn-primary btn-lg" (click)="getStarted()">Get Started</button>
+        <button class="btn btn-outline btn-lg" (click)="goToLearnMore()">Learn More</button>
+      </div>
       <p class="crisis-warning">
         If you are in a crisis or any other person may be in danger - don't use this site.
-        <a href="#">These resources</a> can provide you with immediate help.
+        <a href="#crisis-resources">These resources</a> can provide you with immediate help.
       </p>
     </div>
     <div class="hero-image">
-      <img src="../assets/students-at-university-in-kenya.jpeg" 
-           alt="" 
-           class="responsive-img">
+      <!-- Using your existing image setup -->
+    </div>
+  </section>
+
+  <!-- Inspirational Quote Section -->
+  <section class="quote-section">
+    <div class="container">
+      <div class="inspirational-quote">
+        <i class="quote-icon"></i>
+        <p>{{currentQuote}}</p>
+      </div>
     </div>
   </section>
 
   <!-- Main Pitch Section -->
-  <section class="main-pitch">
-    <h2 class="section-title">Convenient and affordable mental health support with <span class="highlight">Mindscape</span>.</h2>
-    <p class="section-subtitle">
-      Mindscape will match you to one of our qualified counselors based upon your needs, preferences, and counselor availability.
-    </p>
+  <section id="about" class="main-pitch">
+    <div class="container">
+      <h2 class="section-title">Convenient and affordable mental health support with <span class="highlight">Mindscape</span></h2>
+      <p class="section-subtitle">
+        Mindscape will match you to one of our qualified counselors based upon your needs, preferences, and counselor availability.
+      </p>
 
-    <!-- Therapy Selector -->
-    <div class="support-selector-card">
-      <h3>Help us match you to the right support.</h3>
-      <div class="selector-question">
-        <p>What type of support are you looking for?</p>
-        <div class="support-options">
-          <button class="support-option">Individual counseling</button>
-          <button class="support-option">Peer support groups</button>
-          <button class="support-option">Self-help resources</button>
-          <button class="support-option">Crisis support</button>
+      <!-- Support Selector -->
+      <div class="support-selector-card">
+        <h3>Help us match you to the right support</h3>
+        <div class="selector-question">
+          <p>What type of support are you looking for?</p>
+          <div class="support-options">
+            <button class="support-option" (click)="selectSupportType('individual')">Individual counseling</button>
+            <button class="support-option" (click)="selectSupportType('group')">Peer support groups</button>
+            <button class="support-option" (click)="selectSupportType('self-help')">Self-help resources</button>
+            <button class="support-option" (click)="selectSupportType('crisis')">Crisis support</button>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Benefits Section -->
-<section class="benefits-section">
-  <div class="benefit-card">
-      <div class="benefit-icon"></div>
-      <h3 class="benefit-title">It's Professional.</h3>
-      <p class="benefit-description">
-          All counselors are qualified and experienced professionals. Mindscape allows you to connect with them in a safe and convenient online environment.
-      </p>
-  </div>
+  <section id="services" class="benefits-section">
+    <div class="container">
+      <h2 class="section-title">Why Choose Mindscape?</h2>
+      <div class="benefits-grid">
+        <div class="benefit-card" *ngFor="let benefit of benefitsList">
+          <div class="benefit-icon" [style.backgroundImage]="'url(' + benefit.icon + ')'"></div>
+          <h3 class="benefit-title">{{benefit.title}}</h3>
+          <p class="benefit-description">{{benefit.description}}</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-  <div class="benefit-card">
-      <div class="benefit-icon"></div>
-      <h3 class="benefit-title">It's Free.</h3>
-      <p class="benefit-description">
-          Access counseling services and support at no cost. Mental health support doesn't have to be expensive for Chuka University students.
-      </p>
-  </div>
+  <!-- App Explanation Section -->
+  <section class="explanation-section">
+    <div class="container">
+      <div class="explanation-content">
+        <h2 class="section-title">How Mindscape Works</h2>
+        <div class="steps-container">
+          <div class="step-item">
+            <div class="step-number">1</div>
+            <h3>Sign Up</h3>
+            <p>Create your account using your university email. It only takes a minute to get started.</p>
+          </div>
+          <div class="step-item">
+            <div class="step-number">2</div>
+            <h3>Take Assessment</h3>
+            <p>Complete a brief mental health assessment to help us understand your needs better.</p>
+          </div>
+          <div class="step-item">
+            <div class="step-number">3</div>
+            <h3>Get Matched</h3>
+            <p>We'll match you with the right counselor or support option based on your preferences.</p>
+          </div>
+          <div class="step-item">
+            <div class="step-number">4</div>
+            <h3>Begin Your Journey</h3>
+            <p>Start your path to better mental health through counseling, resources, or peer support.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-  <div class="benefit-card">
-      <div class="benefit-icon"></div>
-      <h3 class="benefit-title">It's Convenient.</h3>
-      <p class="benefit-description">
-          Do it at your own time and at your own pace. Communicate with your counselor as often as you want and whenever you feel it's needed.
-      </p>
-  </div>
-
-  <div class="benefit-card">
-      <div class="benefit-icon"></div>
-      <h3 class="benefit-title">It's Effective.</h3>
-      <p class="benefit-description">
-          Thousands of students have benefited from mental health support. With Mindscape, you can switch counselors at any point if you don't feel you are getting enough benefit.
-      </p>
-  </div>
-</section>
+  <!-- Features Section -->
+  <section id="resources" class="features-section">
+    <div class="container">
+      <h2 class="section-title">What Mindscape Offers</h2>
+      <p class="section-subtitle">Comprehensive tools and resources to support your mental wellbeing journey</p>
+      
+      <div class="feature-row">
+        <div class="feature-card" *ngFor="let feature of featuresList.slice(0, 3)">
+          <div class="feature-icon" [style.backgroundImage]="'url(' + feature.icon + ')'"></div>
+          <h3>{{feature.title}}</h3>
+          <p>{{feature.description}}</p>
+        </div>
+      </div>
+      
+      <div class="feature-row">
+        <div class="feature-card" *ngFor="let feature of featuresList.slice(3, 6)">
+          <div class="feature-icon" [style.backgroundImage]="'url(' + feature.icon + ')'"></div>
+          <h3>{{feature.title}}</h3>
+          <p>{{feature.description}}</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- Testimonial Section -->
   <section class="testimonial-section">
-    <div class="testimonial-content">
-      <h2 class="section-title">Join over 5,000 students at Chuka University who decided to get help and get happy</h2>
-      <div class="testimonial-card">
-        <p class="testimonial-text">
-          "Mindscape helped me manage my anxiety during exam season. The counselors are understanding and the resources are really helpful. I'm so glad our university offers this service!"
-        </p>
-        <p class="testimonial-author">— Sarah K., 3rd Year Student</p>
+    <div class="container">
+      <h2 class="section-title">Student Experiences</h2>
+      <div class="testimonial-content">
+        <div class="testimonial-card">
+          <div class="testimonial-avatar">
+            <img [src]="testimonials[currentTestimonialIndex].avatar" alt="Student portrait">
+          </div>
+          <div class="rating">
+            <div class="stars">
+              <span *ngFor="let star of [1, 2, 3, 4, 5]" class="star" 
+                [class.filled]="star <= testimonials[currentTestimonialIndex].rating">★</span>
+            </div>
+          </div>
+          <p class="testimonial-text">
+            {{testimonials[currentTestimonialIndex].text}}
+          </p>
+          <p class="testimonial-author">— {{testimonials[currentTestimonialIndex].author}}</p>
+        </div>
+        
+        <div class="testimonial-nav">
+          <div class="dots">
+            <span *ngFor="let testimonial of testimonials; let i = index" 
+                  class="dot" 
+                  [class.active]="i === currentTestimonialIndex"
+                  (click)="goToTestimonial(i)"></span>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="testimonial-image">
-      <img src="assets/images/sp3.jpg" alt="Happy students using Mindscape">
     </div>
   </section>
-<!-- Features Section -->
-<section class="features-section">
-  <h2 class="section-title">What Mindscape Offers</h2>
-  
-  <div class="feature-row">
-      <div class="feature-card">
-          <div class="feature-icon"></div>
-          <h3>Professional Counseling</h3>
-          <p>Access to qualified mental health professionals for one-on-one sessions.</p>
-      </div>
-      
-      <div class="feature-card">
-          <div class="feature-icon"></div>
-          <h3>Peer Support Groups</h3>
-          <p>Connect with fellow students facing similar challenges in a safe environment.</p>
-      </div>
-      
-      <div class="feature-card">
-          <div class="feature-icon"></div>
-          <h3>Self-Help Resources</h3>
-          <p>Access articles, guides, and tools to manage stress and improve wellbeing.</p>
-      </div>
-  </div>
-  
-  <div class="feature-row">
-      <div class="feature-card">
-          <div class="feature-icon"></div>
-          <h3>Goal Setting</h3>
-          <p>Track your personal and academic goals with our easy-to-use tools.</p>
-      </div>
-      
-      <div class="feature-card">
-          <div class="feature-icon"></div>
-          <h3>Workshops & Webinars</h3>
-          <p>Participate in regular events on mental resilience and emotional intelligence.</p>
-      </div>
-      
-      <div class="feature-card">
-          <div class="feature-icon"></div>
-          <h3>Crisis Support</h3>
-          <p>Immediate help available for students experiencing emotional distress.</p>
-      </div>
-  </div>
-</section>
 
+  <!-- Stats Section -->
+  <section class="stats-section">
+    <div class="container">
+      <div class="stats-row">
+        <div class="stat-item">
+          <div class="stat-number">5,000+</div>
+          <div class="stat-label">Students Using Mindscape</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">25+</div>
+          <div class="stat-label">Professional Counselors</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">12+</div>
+          <div class="stat-label">Peer Support Groups</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">95%</div>
+          <div class="stat-label">Student Satisfaction</div>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- CTA Section -->
   <section class="cta-section">
-    <h2 class="cta-title">Ready to start your journey to better mental health?</h2>
-    <p class="cta-subtitle">Your wellbeing matters. Join Mindscape today.</p>
-    <button class="btn btn-primary btn-large">Get Started Now</button>
+    <div class="container">
+      <h2 class="cta-title">Ready to start your journey to better mental health?</h2>
+      <p class="cta-subtitle">Your wellbeing matters. Join Mindscape today.</p>
+      <button class="btn btn-primary btn-lg" (click)="getStarted()">Get Started Now</button>
+    </div>
+  </section>
+
+  <!-- Crisis Resources Section -->
+  <section id="crisis-resources" class="crisis-resources">
+    <div class="container">
+      <h2 class="section-title">Crisis Resources</h2>
+      <p class="section-subtitle">If you're experiencing a mental health emergency, please contact these resources immediately:</p>
+      
+      <div class="resources-grid">
+        <div class="resource-item">
+          <h3>Campus Emergency Line</h3>
+          <p>Available 24/7 for Chuka University students</p>
+          <a href="tel:+254712345678" class="resource-contact">+254 712 345 678</a>
+        </div>
+        <div class="resource-item">
+          <h3>National Suicide Prevention Hotline</h3>
+          <p>Free and confidential support for people in distress</p>
+          <a href="tel:+254711111111" class="resource-contact">+254 711 111 111</a>
+        </div>
+        <div class="resource-item">
+          <h3>Campus Security</h3>
+          <p>Available 24/7 on university grounds</p>
+          <a href="tel:+254723456789" class="resource-contact">+254 723 456 789</a>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- Footer -->
@@ -197,17 +280,17 @@
         <div class="link-group">
           <h4>Navigation</h4>
           <a href="#">Home</a>
-          <a href="#">Services</a>
-          <a href="#">About</a>
-          <a href="#">Resources</a>
-          <a href="#">Contact</a>
+          <a href="#services">Services</a>
+          <a href="#about">About</a>
+          <a href="#resources">Resources</a>
+          <a href="#contact">Contact</a>
         </div>
         
         <div class="link-group">
           <h4>Resources</h4>
           <a href="#">Mental Health Articles</a>
           <a href="#">Self-Help Guides</a>
-          <a href="#">Crisis Support</a>
+          <a href="#crisis-resources">Crisis Support</a>
           <a href="#">FAQ</a>
         </div>
         
@@ -244,4 +327,7 @@
       </div>
     </div>
   </footer>
+  
+  <!-- Scroll to Top Button -->
+  <button *ngIf="showScrollTop" class="scroll-top-btn" (click)="scrollToTop()">↑</button>
 </div>

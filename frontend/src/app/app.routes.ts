@@ -14,6 +14,7 @@ import { CrisisComponent } from './crisis/crisis.component';
 import { LoginComponent } from './login/login.component';
 import { ProfileComponent } from './profile/profile.component';
 import { PostsComponent } from './posts/posts.component';
+import { MoodComponent } from './mood/mood.component';
 
 
 export const routes: Routes = [
@@ -28,6 +29,7 @@ export const routes: Routes = [
     { path: 'friends', component: FriendsComponent },
     { path: 'profile', component: ProfileComponent },
     { path: 'posts', component: PostsComponent },
+    { path: 'mood', component: MoodComponent },
     
 
     { path: 'counsellor', component: CounselorDashComponent },

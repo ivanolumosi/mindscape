@@ -22,3 +22,28 @@ BEGIN
         AND role = 'counselor';
 END;
 GO
+CREATE PROCEDURE AutoAddCounselorFriends
+    @NewUserId INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Insert friendship between new user and every counselor
+    INSERT INTO Friends (user_id, friend_id)
+    SELECT 
+        @NewUserId AS user_id,
+        id AS friend_id
+    FROM Users
+    WHERE role = 'counselor'
+      AND id != @NewUserId  -- Avoid self-friendship (just in case)
+
+    UNION ALL
+
+    -- Insert friendship between every counselor and new user (reverse direction)
+    SELECT 
+        id AS user_id,
+        @NewUserId AS friend_id
+    FROM Users
+    WHERE role = 'counselor'
+      AND id != @NewUserId;
+END

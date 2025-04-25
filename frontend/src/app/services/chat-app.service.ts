@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Post } from '../interfaces/post';
+import { Post } from '../interfaces/PostModel';
 import { Comment } from '../interfaces/comment';
 import { DirectMessage } from '../interfaces/Direct_messages';
 import { AuthService } from './auth.service';
@@ -136,4 +136,9 @@ export class ChatAppService {
   deleteOldMessages(): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/messages/old`);
   }
+  createOrOpenChat(friendId: number): void {
+    console.log(`Opening chat with friendId: ${friendId}`);
+    // TODO: Implement navigation or logic to open chat
+  }
+
 }

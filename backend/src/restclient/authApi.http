@@ -17,7 +17,7 @@ POST http://localhost:3000/api/auth/login
 Content-Type: application/json
 
 {
-  "email": "Jeffkinuthia@example.com",
+  "email": "alphonsepeters@example.com",
   "password": "SecurePass@123"
 }
 
@@ -65,7 +65,6 @@ Content-Type: application/json
   "name": "New Name",
   "password": "NewSecurePass@123"
 }
-
 ### 5️⃣ Update counsellor Profile
 PUT http://localhost:3000/api/auth/profile/counselor
 Content-Type: application/json
@@ -74,7 +73,7 @@ Content-Type: application/json
   "userId":2024,
   "name": "John Doe",                         
   "email": "john.doe@example.com",             
-  "profileImage": "https://example.com/counselor-image.png",
+  "profileImage": "https://www.pinterest.com/pin/70228075434307827/",
   "specialization": "Career Counseling",
   "availabilitySchedule": "Mon-Fri 9am-5pm"
 }
@@ -88,7 +87,16 @@ Content-Type: application/json
   "newRole": "counselor"
 }
 
+### 🖼️ Upload Profile Image
+POST http://localhost:3000/api/auth/profile/upload-profile-image?userId=2024
+Content-Type: multipart/form-data; boundary=MyBoundary
 
+--MyBoundary
+Content-Disposition: form-data; name="file"; filename="profile-pic.png"
+Content-Type: image/png
+
+< C:/Users/zilla/Pictures/rottweiler2.jpg
+--MyBoundary--
 
 
 

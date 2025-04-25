@@ -1,21 +1,23 @@
 <aside class="sidebar">
+  <app-sidebar *ngIf="showSidebar"></app-sidebar>
+  <!-- Logo -->
   <div class="logo-section">
     <img src="assets/images/mindscape-logo.png" alt="Mindscape Logo" class="logo">
     <span class="logo-text">Mindscape</span>
   </div>
-  
-  <!-- User profile section -->
+
+  <!-- User Info -->
   <div class="user-profile" *ngIf="currentUser; else loginPrompt">
     <div class="user-avatar">
       <img [src]="getUserAvatar()" [alt]="currentUser.name + ' Avatar'">
     </div>
     <div class="user-info">
-      <p class="user-name">{{ currentUser.name }}</p>
+      <p class="user-name">{{ getUserName() }}</p>
       <span class="user-status">{{ getUserRoleText() }}</span>
     </div>
   </div>
-  
-  <!-- Login prompt if no user -->
+
+  <!-- Login prompt for guests -->
   <ng-template #loginPrompt>
     <div class="login-prompt">
       <a routerLink="/login" class="login-link">
@@ -24,9 +26,9 @@
       </a>
     </div>
   </ng-template>
-  
-  <!-- Dynamic navigation based on user role -->
-  <nav class="side-nav">
+
+  <!-- Navigation links -->
+  <nav class="side-nav" *ngIf="currentUser">
     <ul>
       <li class="nav-item" *ngFor="let item of navItems" routerLinkActive="active">
         <a [routerLink]="item.route" class="nav-link">
@@ -36,15 +38,14 @@
       </li>
     </ul>
   </nav>
-  
-  <!-- Sidebar footer -->
+
+  <!-- Footer with Crisis Help and Logout -->
   <div class="sidebar-footer">
     <a routerLink="/crisis" class="crisis-help">
       <i class="icon crisis-icon"></i>
       <span>Crisis Support</span>
     </a>
-    
-    <!-- Logout button for logged in users -->
+
     <a *ngIf="currentUser" (click)="logout()" class="logout-btn">
       <i class="icon logout-icon"></i>
       <span>Logout</span>

@@ -12,6 +12,11 @@ import crisisRoutes from './routes/crisisRoutes';
 import friendsRoutes from './routes/friendsRoutes';
 import notificationsRoutes from './routes/notificationsRoutes';
 import authRoutes from './routes/authRoutes';
+import debugRoutes from './routes/debugRoutes';
+import chatappRoutes from './routes/chatapp';
+import messageRoutes from './routes/messages.routes';
+import postRoutes from './routes/post.routes';
+import counselorAnalyticsRoutes from './routes/counselorAnalyticsRoutes.ts';
 
 dotenv.config();
 
@@ -34,6 +39,11 @@ app.use('/api/chat', chatApplicationRoutes);
 app.use('/api/crisis', crisisRoutes);
 app.use('/api/friends', friendsRoutes);
 app.use('/api/notifications', notificationsRoutes);
+app.use('/api/debug', debugRoutes);
+app.use('/api', chatappRoutes); 
+app.use('/api', postRoutes);
+app.use('/api', messageRoutes);
+app.use('/api/analytics', counselorAnalyticsRoutes);
 
 
 // ✅ Root Route

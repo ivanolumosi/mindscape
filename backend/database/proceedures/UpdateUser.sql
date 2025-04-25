@@ -1,4 +1,4 @@
-ALTER PROCEDURE UpdateUser
+CREATE PROCEDURE UpdateUser
     @id INT,
     @name NVARCHAR(100) = NULL,
     @email NVARCHAR(100) = NULL,

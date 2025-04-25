@@ -22,4 +22,4 @@ ADD
     wants_daily_emails BIT DEFAULT 0;        -- Whether user wants daily email notifications
 
 
-SELECT * FROM Users WHERE id = 4020;
+SELECT * FROM Users

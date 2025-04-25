@@ -1,0 +1,196 @@
+### 🧪 Test API Root
+GET http://localhost:3000/
+
+### 1️⃣ Create or Update User Profile
+POST http://localhost:3000/api/user
+Content-Type: application/json
+
+{
+  "name": "Jane Doe",
+  "email": "janedoe@example.com",
+  "password": "JaneSecure123",
+  "role": "counselor",
+  "profileImage": "https://example.com/image.png",
+  "specialization": "Academic Counseling",
+  "faculty": "Engineering",
+  "privileges": "moderator",
+  "availabilitySchedule": "Mon-Fri 9-5",
+  "nickname": "JD"
+}
+
+### 2️⃣ Get User Profile
+GET http://localhost:3000/api/user/1
+
+### 3️⃣ Delete User
+DELETE http://localhost:3000/api/user/1
+
+### 4️⃣ Send Friend Request
+POST http://localhost:3000/api/friend-request/send
+Content-Type: application/json
+
+{
+  "senderId": 1,
+  "receiverId": 2
+}
+
+### 5️⃣ Respond to Friend Request
+POST http://localhost:3000/api/friend-request/respond
+Content-Type: application/json
+
+{
+  "requestId": 101,
+  "response": "accepted"
+}
+
+### 6️⃣ Cancel Friend Request
+DELETE http://localhost:3000/api/friend-request/101
+
+### 7️⃣ Remove Friend
+POST http://localhost:3000/api/friend/remove
+Content-Type: application/json
+
+{
+  "userId": 1,
+  "friendId": 2
+}
+
+### 8️⃣ Get Friend List
+GET http://localhost:3000/api/friends/1
+
+### 9️⃣ Get Pending Friend Requests (all)
+GET http://localhost:3000/api/friend-requests/1
+
+### 🔟 Get Pending Friend Requests (sent only)
+GET http://localhost:3000/api/friend-requests/1?requestType=sent
+
+### 🔁 Get Recommended Friends (default)
+GET http://localhost:3000/api/recommended-friends/1
+
+### 🔁 Get Recommended Friends (mutual, limit 5)
+GET http://localhost:3000/api/recommended-friends/1?recommendationType=mutual&limit=5
+
+# ====================
+# 📩 Direct Messaging
+# ====================
+
+### Send Direct Message
+POST http://localhost:3000/api/direct-message
+Content-Type: application/json
+
+{
+  "senderId": 1,
+  "receiverId": 2,
+  "content": "Hello there!",
+  "contentType": "text"
+}
+
+### Edit Direct Message
+PUT http://localhost:3000/api/direct-message
+Content-Type: application/json
+
+{
+  "messageId": 1,
+  "senderId": 1,
+  "content": "Updated message!"
+}
+
+### Mark Direct Message as Read
+PUT http://localhost:3000/api/direct-message/read
+Content-Type: application/json
+
+{
+  "messageId": 1,
+  "receiverId": 2
+}
+
+### Get Chat History Between Two Users
+GET http://localhost:3000/api/chat-history/1/2
+
+### Get User Chat List
+GET http://localhost:3000/api/chat-list/1
+
+### Get Unread Message Count
+GET http://localhost:3000/api/unread-count/1
+
+# ====================
+# 👥 Group Messaging
+# ====================
+
+### Create Group
+POST http://localhost:3000/api/group
+Content-Type: application/json
+
+{
+  "name": "Study Group",
+  "description": "For study discussions",
+  "createdBy": 1,
+  "initialMembers": "2,3,4"
+}
+
+### Delete Group
+DELETE http://localhost:3000/api/group
+Content-Type: application/json
+
+{
+  "groupId": 1,
+  "userId": 1
+}
+
+### Join Group
+POST http://localhost:3000/api/group/join
+Content-Type: application/json
+
+{
+  "groupId": 1,
+  "userId": 5
+}
+
+### Leave Group
+POST http://localhost:3000/api/group/leave
+Content-Type: application/json
+
+{
+  "groupId": 1,
+  "userId": 5
+}
+
+### Change Group Admin
+POST http://localhost:3000/api/group/admin
+Content-Type: application/json
+
+{
+  "groupId": 1,
+  "adminId": 1,
+  "userId": 5,
+  "makeAdmin": true
+}
+
+### Send Group Message
+POST http://localhost:3000/api/group/message
+Content-Type: application/json
+
+{
+  "groupId": 1,
+  "senderId": 1,
+  "content": "Welcome to the group!",
+  "contentType": "text"
+}
+
+### Get Group Messages
+GET http://localhost:3000/api/group/messages/1/1
+
+### Get User Groups
+GET http://localhost:3000/api/groups/1
+
+### Get Group Members
+GET http://localhost:3000/api/group/members/1/1
+
+### Send Group Invite
+POST http://localhost:3000/api/group/invite
+Content-Type: application/json
+
+{
+  "groupId": 1,
+  "senderId": 1,
+  "receiverId": 6
+}

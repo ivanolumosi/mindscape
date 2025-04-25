@@ -1,9 +1,13 @@
 export interface Comment {
-    id: number;                           // Unique identifier for each comment
-    post_id: number;                      // The post the comment belongs to (references Posts table)
-    user_id: number;                      // The user who commented (references Users table)
-    content: string;                      // The content of the comment
-    created_at: Date;                     // Timestamp when the comment was created
-    updated_at: Date;                     // Timestamp when the comment was last updated
-  }
-  
+  id: number;
+  content: string;
+  content_type: string;
+  media_url: string | null;
+  created_at: Date;
+  updated_at: Date;
+  user_id: number;
+  user_name: string;
+  profile_image: string | null;
+  nickname: string | null;
+  is_counselor: boolean;
+}

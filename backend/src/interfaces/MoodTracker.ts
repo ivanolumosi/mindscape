@@ -4,5 +4,6 @@ export interface MoodTracker {
     mood: string;                             // The mood value (e.g., "happy", "sad", "anxious")
     notes?: string;                           // Optional additional notes or thoughts
     recorded_at: Date;                       // Timestamp for when the mood was recorded
+    mood_type:string;
   }
   
