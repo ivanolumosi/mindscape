@@ -6,10 +6,10 @@ POST http://localhost:3000/api/auth/register
 Content-Type: application/json
 
 {
-  "name": "Jeff Kinuthia",
-  "email": "Jeffkinuthia@example.com",
+  "name": "Martin Kipkoech",
+  "email": "martinkipkoecha@example.com",
   "password": "SecurePass@123",
-  "role": "seeker"
+  "role": "counselor"
 }
 
 ### 2️⃣ Login User

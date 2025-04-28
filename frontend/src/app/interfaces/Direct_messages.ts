@@ -8,4 +8,5 @@ export interface DirectMessage {
   createdAt: Date;
   isRead: boolean;
   parentMessageId?: number;
+  
 }

@@ -1,23 +1,26 @@
+// src/app/interfaces/users.ts
 export interface User {
-  status?: 'online' | 'away' | 'busy' | 'offline'; // ✅ Add this
-    id?: number;
-    userId?: number;
-    name: string;
-    email: string;
-    password?: string;
-    role: 'seeker' | 'admin' | 'counselor';
-    profileImage?: string;
-    specialization?: string;
-    availabilitySchedule?: string;
-    faculty?: string;
-    privileges?: string;
-    nickname?: string;
-    isProfileComplete?: boolean;
-    
-  }
+  id?: number;
+  userId?: number;
+  name: string;
+  email: string;
+  password?: string;
+  role: 'student' | 'admin' | 'counselor';
+  profileImage?: string;
+  specialization?: string;
+  availabilitySchedule?: string;
+  faculty?: string;
+  privileges?: string;
+  nickname?: string;
+  isProfileComplete?: boolean;
+  status?: 'online' | 'away' | 'busy' | 'offline';
+  journalCount?: number;
+  lastActivity?: string;
+}
   export interface ChatUser {
 status: string|string[]|Set<string>|{ [klass: string]: any; }|null|undefined;
     id: number;
+    faculty?: string; 
     name: string;
     profile_image?: string;
     role: string;

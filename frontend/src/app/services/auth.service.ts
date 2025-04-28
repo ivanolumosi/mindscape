@@ -13,10 +13,9 @@ export interface BaseUser {
   role: 'seeker' | 'admin' | 'counselor';
   isProfileComplete?: boolean;
   nickname?: string;
-  status?: 'online' | 'away' | 'busy' | 'offline'; // ✅ Add this
-
-
-
+  status?: 'online' | 'away' | 'busy' | 'offline';
+  faculty?: string;
+  profileImage?: string;
 }
 
 export interface Seeker extends BaseUser {
@@ -24,21 +23,25 @@ export interface Seeker extends BaseUser {
   profileImage?: string;
   wantsDailyEmails?: boolean;
   nickname?: string;
-    isProfileComplete?: boolean;
-    status?: 'online' | 'away' | 'busy' | 'offline'; // ✅ Add this
-  }
+  isProfileComplete?: boolean;
+  status?: 'online' | 'away' | 'busy' | 'offline';
+}
 
 export interface Counselor extends BaseUser {
   profileImage?: string;
   specialization?: string;
   availabilitySchedule?: string;
   nickname?: string;
-
+  faculty?: string; // Add this line
+  
+  
 }
 
 export interface Admin extends BaseUser {
   privileges?: string;
   profileImage?: string;
+  faculty?: string; // Add this line
+
 }
 
 // Union type for any user

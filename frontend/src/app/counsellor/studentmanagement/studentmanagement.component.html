@@ -1,0 +1,396 @@
+<div class="student-management-container">
+  <!-- Loading indicator and error messages -->
+  <div *ngIf="loading" class="loading-indicator">
+    Loading data...
+  </div>
+  
+  <div *ngIf="error" class="error-message">
+    {{ error }}
+    <button (click)="clearError()">Dismiss</button>
+  </div>
+
+  <div class="student-management-layout">
+    <!-- Left sidebar: All Seekers List -->
+    <div class="sidebar students-list">
+      <div class="section-header">
+        <h2>Student Management</h2>
+      </div>
+      
+      <!-- Search and filter controls -->
+      <div class="filters-section">
+        <div class="search-box">
+          <input 
+            type="text" 
+            placeholder="Search students..." 
+            [(ngModel)]="searchTerm"
+            (input)="searchSeekers()">
+        </div>
+        
+        <div class="faculty-filter">
+          <label for="facultySelect">Filter by Faculty:</label>
+          <select id="facultySelect" [(ngModel)]="currentFaculty" (change)="filterByFaculty(currentFaculty)">
+            <option value="">All Faculties</option>
+            <option *ngFor="let faculty of faculties" [value]="faculty">{{ faculty }}</option>
+          </select>
+        </div>
+        
+        <button class="reset-button" (click)="resetFilters()">Reset Filters</button>
+      </div>
+      
+      <!-- Students list -->
+      <div class="students-list-container">
+        <h3>Students ({{ filteredSeekers.length }})</h3>
+        <div *ngIf="filteredSeekers.length === 0">No students match the current filters.</div>
+        
+        <ul class="student-list">
+          <li *ngFor="let seeker of filteredSeekers" 
+              [class.active]="selectedSeeker && (selectedSeeker.id === seeker.id || selectedSeeker.userId === seeker.userId)"
+              (click)="selectSeeker(seeker)">
+            <div class="student-info">
+              <span class="student-name">{{ seeker.name }}</span>
+              <span class="student-faculty">{{ seeker.faculty }}</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Main content area: Student Details -->
+    <div class="main-content student-details">
+      <div *ngIf="!selectedSeeker" class="no-selection-message">
+        <h2>Counselor Dashboard</h2>
+        <p>Select a student from the list to view their details and provide support.</p>
+        
+        <!-- Display counselor analytics when no student is selected -->
+        <div class="analytics-dashboard" *ngIf="facultyMetrics || overallMoodTrends">
+          <h3>Counseling Analytics</h3>
+          
+          <div class="analytics-cards">
+            <div class="analytics-card" *ngIf="facultyMetrics">
+              <h4>Faculty Metrics</h4>
+              <div class="faculty-stats">
+                <div *ngFor="let metric of facultyMetrics">
+                  <strong>{{ metric.faculty }}:</strong> {{ metric.seekerCount }} students, 
+                  Avg. Mood: {{ metric.averageMood }}
+                </div>
+              </div>
+            </div>
+            
+            <div class="analytics-card" *ngIf="overallMoodTrends">
+              <h4>Overall Mood Trends</h4>
+              <div class="mood-trends">
+                <div *ngFor="let trend of overallMoodTrends">
+                  <strong>{{ trend.period }}:</strong> {{ trend.dominantMood }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="selectedSeeker" class="student-dashboard">
+        <div class="student-header">
+          <h2>{{ selectedSeeker.name }}</h2>
+          <div class="student-meta">
+            <span>{{ selectedSeeker.email }}</span>
+            <span>{{ selectedSeeker.faculty }}</span>
+          </div>
+        </div>
+
+        <!-- Date range filter -->
+        <div class="date-inputs">
+          <div class="date-field">
+            <label for="startDate">From:</label>
+            <input type="date" id="startDate" 
+                  [value]="dateRange.startDate.toISOString().split('T')[0]"
+                  (change)="updateStartDate($event)">
+          </div>
+          <div class="date-field">
+            <label for="endDate">To:</label>
+            <input type="date" id="endDate"
+                  [value]="dateRange.endDate.toISOString().split('T')[0]"
+                  (change)="updateEndDate($event)">
+          </div>
+          <button (click)="filterByDateRange()">Apply Filter</button>
+          <button (click)="createSession()">Create Session</button>
+        </div>
+
+        <!-- Tab navigation -->
+        <div class="tab-navigation">
+          <button [class.active]="activeTab === 'overview'" (click)="setActiveTab('overview')">Overview</button>
+          <button [class.active]="activeTab === 'moods'" (click)="setActiveTab('moods')">Mood Tracking</button>
+          <button [class.active]="activeTab === 'journals'" (click)="setActiveTab('journals')">Journals</button>
+          <button [class.active]="activeTab === 'goals'" (click)="setActiveTab('goals')">Goals</button>
+          <button [class.active]="activeTab === 'resources'" (click)="setActiveTab('resources')">Resources</button>
+          <button [class.active]="activeTab === 'chat'" (click)="setActiveTab('chat')">Chat</button>
+        </div>
+
+        <!-- Tab content -->
+        <div class="tab-content">
+          <!-- Overview Tab -->
+          <div *ngIf="activeTab === 'overview'" class="tab-pane overview">
+            <div class="stats-overview">
+              <div class="stat-card">
+                <h4>Mood Entries</h4>
+                <div class="stat-value">{{ seekerMoods.length }}</div>
+              </div>
+              <div class="stat-card">
+                <h4>Journal Entries</h4>
+                <div class="stat-value">{{ seekerJournals.length }}</div>
+              </div>
+              <div class="stat-card">
+                <h4>Active Goals</h4>
+                <div class="stat-value">{{ seekerPendingGoals.length }}</div>
+              </div>
+              <div class="stat-card">
+                <h4>Completed Goals</h4>
+                <div class="stat-value">{{ seekerCompletedGoals.length }}</div>
+              </div>
+            </div>
+
+            <div class="recent-activity">
+              <h3>Recent Activity</h3>
+              
+              <!-- Recent Moods -->
+              <div class="recent-section">
+                <h4>Recent Moods</h4>
+                <div *ngIf="seekerMoods.length === 0">No mood entries recorded.</div>
+                <ul *ngIf="seekerMoods.length > 0">
+                  <li *ngFor="let mood of seekerMoods.slice(0, 3)">
+                    <div class="mood-entry">
+                      <span class="mood-date">{{ mood.recorded_at | date }}</span>
+                      <span class="mood-value">{{ mood.mood }}</span>
+                      <span *ngIf="mood.notes" class="mood-notes">{{ mood.notes }}</span>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+              
+              <!-- Recent Journals -->
+              <div class="recent-section">
+                <h4>Recent Journals</h4>
+                <div *ngIf="seekerJournals.length === 0">No journal entries recorded.</div>
+                <ul *ngIf="seekerJournals.length > 0">
+                  <li *ngFor="let journal of seekerJournals.slice(0, 3)">
+                    <div class="journal-entry">
+                      <div class="journal-header">
+                        <span class="journal-date">{{ journal.entry_date | date }}</span>
+                        <span class="journal-mood">Mood: {{ journal.mood }}</span>
+                      </div>
+                      <div class="journal-content" *ngIf="journal.reflections">
+                        {{ journal.reflections.substring(0, 100) }}{{ journal.reflections.length > 100 ? '...' : '' }}
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+
+              <!-- Actions -->
+              <div class="action-buttons">
+                <button (click)="findSimilarUsers()">Find Similar Users</button>
+                <button (click)="setActiveTab('chat')">Start Conversation</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Moods Tab -->
+          <div *ngIf="activeTab === 'moods'" class="tab-pane moods">
+            <h3>Mood History</h3>
+            
+            <div class="mood-stats">
+              <h4>Mood Distribution</h4>
+              <div class="mood-distribution">
+                <div *ngFor="let stat of seekerMoodStats" class="mood-stat">
+                  <span class="mood-name">{{ stat.mood }}</span>
+                  <span class="mood-count">{{ stat.mood_count }}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mood-list">
+              <h4>All Mood Entries ({{ seekerMoods.length }})</h4>
+              <div *ngIf="seekerMoods.length === 0">No mood entries found for the selected period.</div>
+              
+              <table *ngIf="seekerMoods.length > 0">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Mood</th>
+                    <th>Notes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let mood of seekerMoods">
+                    <td>{{ mood.recorded_at | date }}</td>
+                    <td>{{ mood.mood }}</td>
+                    <td>{{ mood.notes || 'No notes' }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Journals Tab -->
+          <div *ngIf="activeTab === 'journals'" class="tab-pane journals">
+            <h3>Journal Entries</h3>
+            
+            <div *ngIf="seekerJournals.length === 0">No journal entries found for the selected period.</div>
+            
+            <div *ngIf="seekerJournals.length > 0" class="journal-entries">
+              <div *ngFor="let journal of seekerJournals" class="journal-entry-full">
+                <div class="journal-header">
+                  <h4>{{ journal.title || 'Journal Entry' }}</h4>
+                  <span class="journal-date">{{ journal.entry_date | date }}</span>
+                </div>
+                
+                <div class="journal-details">
+                  <div class="journal-mood">Mood: {{ journal.mood }}</div>
+                  
+                  <div *ngIf="journal.reflections" class="journal-section">
+                    <h5>Reflections</h5>
+                    <p>{{ journal.reflections }}</p>
+                  </div>
+                  
+                  <div *ngIf="journal.gratitude" class="journal-section">
+                    <h5>Gratitude</h5>
+                    <p>{{ journal.gratitude }}</p>
+                  </div>
+                  
+                  <div *ngIf="journal.content" class="journal-section">
+                    <h5>Additional Content</h5>
+                    <p>{{ journal.content }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Goals Tab -->
+          <div *ngIf="activeTab === 'goals'" class="tab-pane goals">
+            <h3>Goals Tracking</h3>
+            
+            <div class="goals-sections">
+              <!-- Active Goals -->
+              <div class="goals-section">
+                <h4>Active Goals ({{ seekerPendingGoals.length }})</h4>
+                <div *ngIf="seekerPendingGoals.length === 0">No active goals found.</div>
+                
+                <div *ngIf="seekerPendingGoals.length > 0" class="goals-list">
+                  <div *ngFor="let goal of seekerPendingGoals" class="goal-item">
+                    <div class="goal-header">
+                      <h5>{{ goal.goal_title }}</h5>
+                      <span class="goal-type">{{ goal.goal_type }}</span>
+                    </div>
+                    
+                    <div class="goal-description" *ngIf="goal.goal_description">
+                      {{ goal.goal_description }}
+                    </div>
+                    
+                    <div class="goal-meta">
+                      <div *ngIf="goal.due_date" class="goal-due-date">
+                        Due: {{ goal.due_date | date }}
+                      </div>
+                      <div class="goal-progress">
+                        Progress: {{ goal.progress_percentage }}%
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Completed Goals -->
+              <div class="goals-section">
+                <h4>Completed Goals ({{ seekerCompletedGoals.length }})</h4>
+                <div *ngIf="seekerCompletedGoals.length === 0">No completed goals found.</div>
+                
+                <div *ngIf="seekerCompletedGoals.length > 0" class="goals-list">
+                  <div *ngFor="let goal of seekerCompletedGoals" class="goal-item completed">
+                    <div class="goal-header">
+                      <h5>{{ goal.goal_title }}</h5>
+                      <span class="goal-type">{{ goal.goal_type }}</span>
+                    </div>
+                    
+                    <div class="goal-description" *ngIf="goal.goal_description">
+                      {{ goal.goal_description }}
+                    </div>
+                    
+                    <div class="goal-meta">
+                      <div *ngIf="goal.due_date" class="goal-due-date">
+                        Due: {{ goal.due_date | date }}
+                      </div>
+                      <div class="goal-progress">
+                        Completed
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Resources Tab -->
+          <div *ngIf="activeTab === 'resources'" class="tab-pane resources">
+            <h3>Recommended Resources</h3>
+
+            <div *ngIf="recommendedResources.length === 0">No recommended resources available.</div>
+            
+            <div *ngIf="recommendedResources.length > 0" class="resources-list">
+              <div *ngFor="let resource of recommendedResources" class="resource-item">
+                <div class="resource-header">
+                  <h4>{{ resource.title }}</h4>
+                  <span class="resource-type">{{ resource.type }}</span>
+                </div>
+                
+                <div class="resource-description" *ngIf="resource.description">
+                  {{ resource.description }}
+                </div>
+                
+                <div class="resource-meta">
+                  <div *ngIf="resource.author" class="resource-author">
+                    By: {{ resource.author }}
+                  </div>
+                  <div *ngIf="resource.date_published" class="resource-date">
+                    Published: {{ resource.date_published | date }}
+                  </div>
+                </div>
+                
+                <div class="resource-actions">
+                  <a *ngIf="resource.url" [href]="resource.url" target="_blank" class="view-resource">View Resource</a>
+                  <button (click)="recommendResource(resource.id)" class="recommend-button">Recommend to Student</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chat Tab -->
+          <div *ngIf="activeTab === 'chat'" class="tab-pane chat">
+            <h3>Conversation with {{ selectedSeeker.name }}</h3>
+            
+            <div class="chat-container">
+              <div class="chat-history">
+                <div *ngIf="chatHistory.length === 0" class="no-messages">
+                  No previous messages. Start a conversation.
+                </div>
+                
+                <div *ngFor="let message of chatHistory" class="chat-message"
+                    [class.outgoing]="message.senderId === authService.getCurrentUserId()"
+                    [class.incoming]="message.senderId !== authService.getCurrentUserId()">
+                  <div class="message-content">{{ message.content }}</div>
+                  <div class="message-time">{{ message.timestamp | date:'short' }}</div>
+                </div>
+              </div>
+              
+              <div class="message-input">
+                <textarea 
+                  [(ngModel)]="newMessage" 
+                  placeholder="Type your message..." 
+                  (keyup.enter)="sendMessage()"></textarea>
+                <button (click)="sendMessage()">Send</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -296,7 +296,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   getStarted(): void { 
     console.log('Get started clicked');
     if (this.isLoggedIn) {
-      this.router.navigate(['/login']);
+      this.router.navigate(['/login ']);
     } else {
       this.router.navigate(['/login'], { queryParams: { redirect: 'get-started' } });
     }

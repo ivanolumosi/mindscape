@@ -127,26 +127,6 @@ export class CounsellorDashService {
   }
 
   // -------------------------
-  // Core User Management
-  // -------------------------
-
-  getAllStudents(): Observable<User[]> {
-    return this.userService.getUsersByRole('student');
-  }
-
-  getStudentsByFaculty(faculty: string): Observable<User[]> {
-    return this.userService.getUsersByFaculty(faculty);
-  }
-
-  getStudentProfile(userId: number): Observable<User> {
-    return this.profileService.getUserProfile(userId);
-  }
-
-  updateStudentProfile(userId: number, profileData: Partial<User>): Observable<User> {
-    return this.userService.updateUser(userId, profileData);
-  }
-
-  // -------------------------
   // Journal Management
   // -------------------------
 

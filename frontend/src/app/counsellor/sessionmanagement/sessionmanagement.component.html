@@ -1,0 +1,487 @@
+<div class="counsellor-session-management">
+  <h2 class="section-title">Session Management</h2>
+  
+  <!-- Loading indicator -->
+  <div *ngIf="loading" class="loading-container">
+      <div class="spinner"></div>
+      <p>Loading data...</p>
+  </div>
+  
+  <!-- Tab Navigation -->
+  <div class="tab-navigation">
+      <div class="tab-buttons">
+          <button class="tab-button" [ngClass]="{'active': activeTab === 'sessions'}" (click)="switchTab('sessions')">
+              <i class="icon icon-event"></i>
+              Sessions
+          </button>
+          <button class="tab-button" [ngClass]="{'active': activeTab === 'schedule'}" (click)="switchTab('schedule')">
+              <i class="icon icon-calendar"></i>
+              Weekly Schedule
+          </button>
+          <button class="tab-button" [ngClass]="{'active': activeTab === 'availability'}" (click)="switchTab('availability')">
+              <i class="icon icon-time"></i>
+              Set Availability
+          </button>
+      </div>
+  </div>
+  
+  <!-- Sessions Tab -->
+  <div *ngIf="activeTab === 'sessions'" class="tab-content sessions-tab">
+      <div class="header-actions">
+          <h3>My Sessions</h3>
+          <div class="action-buttons">
+              <button class="primary-button" (click)="navigateToStudents()">
+                  <i class="icon icon-people"></i>
+                  Manage Students
+              </button>
+              <button class="primary-button" (click)="sessionForm.reset(); selectedSession = null">
+                  <i class="icon icon-add"></i>
+                  Schedule New Session
+              </button>
+          </div>
+      </div>
+      
+      <div class="content-container">
+          <!-- Session Form -->
+          <div *ngIf="!selectedSession" class="session-form-container">
+              <div class="card">
+                  <div class="card-header">
+                      <h4 class="card-title">Schedule a New Session</h4>
+                  </div>
+                  <div class="card-content">
+                      <form [formGroup]="sessionForm" (ngSubmit)="createSession()">
+                          <div class="form-row">
+                              <div class="form-field">
+                                  <label for="title">Session Title</label>
+                                  <input id="title" type="text" formControlName="title" placeholder="e.g. Stress Management Workshop">
+                                  <div *ngIf="sessionForm.get('title')?.invalid && sessionForm.get('title')?.touched" class="error-message">
+                                      Title is required
+                                  </div>
+                              </div>
+                          </div>
+                          
+                          <div class="form-row">
+                              <div class="form-field">
+                                  <label for="venue">Venue</label>
+                                  <input id="venue" type="text" formControlName="venue" placeholder="e.g. Room 203, Student Center">
+                                  <div *ngIf="sessionForm.get('venue')?.invalid && sessionForm.get('venue')?.touched" class="error-message">
+                                      Venue is required
+                                  </div>
+                              </div>
+                          </div>
+                          
+                          <div class="form-row two-col">
+                              <div class="form-field">
+                                  <label for="date">Date</label>
+                                  <input id="date" type="date" formControlName="date">
+                                  <div *ngIf="sessionForm.get('date')?.invalid && sessionForm.get('date')?.touched" class="error-message">
+                                      Date is required
+                                  </div>
+                              </div>
+                              
+                              <div class="form-field">
+                                  <label for="maxParticipants">Maximum Participants</label>
+                                  <input id="maxParticipants" type="number" formControlName="maxParticipants" min="1">
+                                  <div *ngIf="sessionForm.get('maxParticipants')?.hasError('required') && sessionForm.get('maxParticipants')?.touched" class="error-message">
+                                      Max participants is required
+                                  </div>
+                                  <div *ngIf="sessionForm.get('maxParticipants')?.hasError('min') && sessionForm.get('maxParticipants')?.touched" class="error-message">
+                                      Must be at least 1
+                                  </div>
+                              </div>
+                          </div>
+                          
+                          <div class="form-row two-col">
+                              <div class="form-field">
+                                  <label for="startTime">Start Time</label>
+                                  <input id="startTime" type="time" formControlName="startTime">
+                                  <div *ngIf="sessionForm.get('startTime')?.invalid && sessionForm.get('startTime')?.touched" class="error-message">
+                                      Start time is required
+                                  </div>
+                              </div>
+                              
+                              <div class="form-field">
+                                  <label for="endTime">End Time</label>
+                                  <input id="endTime" type="time" formControlName="endTime">
+                                  <div *ngIf="sessionForm.get('endTime')?.invalid && sessionForm.get('endTime')?.touched" class="error-message">
+                                      End time is required
+                                  </div>
+                              </div>
+                          </div>
+                          
+                          <div class="form-row">
+                              <div class="form-field">
+                                  <label for="description">Description</label>
+                                  <textarea id="description" formControlName="description" rows="4" 
+                                    placeholder="Provide details about the session..."></textarea>
+                                  <div *ngIf="sessionForm.get('description')?.invalid && sessionForm.get('description')?.touched" class="error-message">
+                                      Description is required
+                                  </div>
+                              </div>
+                          </div>
+                          
+                          <div class="form-actions">
+                              <button type="button" class="secondary-button" (click)="sessionForm.reset()">Cancel</button>
+                              <button type="submit" class="primary-button" [disabled]="sessionForm.invalid">
+                                  Schedule Session
+                              </button>
+                          </div>
+                      </form>
+                  </div>
+              </div>
+          </div>
+          
+          <!-- Session Details View -->
+          <div *ngIf="selectedSession" class="session-details-container">
+              <div class="card">
+                  <div class="card-header">
+                      <div class="session-icon">
+                          <i class="icon icon-event"></i>
+                      </div>
+                      <h4 class="card-title">{{selectedSession.title}}</h4>
+                      <span class="session-status" [ngClass]="getStatusClass(selectedSession.status || '')">
+                          {{selectedSession.status?.toUpperCase() || 'SCHEDULED'}}
+                      </span>
+                      <button class="close-button" (click)="closeSessionDetails()">
+                          <i class="icon icon-close"></i>
+                      </button>
+                  </div>
+                  
+                  <div class="card-content">
+                      <div class="details-grid">
+                          <div class="detail-item">
+                              <span class="label">Date:</span>
+                              <span class="value">{{selectedSession.date | date:'fullDate'}}</span>
+                          </div>
+                          
+                          <div class="detail-item">
+                              <span class="label">Time:</span>
+                              <span class="value">
+                                  {{selectedSession.startTime}} - {{selectedSession.endTime}}
+                              </span>
+                          </div>
+                          
+                          <div class="detail-item">
+                              <span class="label">Venue:</span>
+                              <span class="value">{{selectedSession.venue}}</span>
+                          </div>
+                          
+                          <div class="detail-item">
+                              <span class="label">Participants:</span>
+                              <span class="value">
+                                  {{selectedSession.currentParticipants || 0}} / {{selectedSession.maxParticipants}}
+                              </span>
+                          </div>
+                      </div>
+                      
+                      <div class="session-description">
+                          <h4>Session Description</h4>
+                          <p>{{selectedSession.description}}</p>
+                      </div>
+                      
+                      <!-- Participants list -->
+                      <div class="participants-section">
+                          <h4>Participants</h4>
+                          <p *ngIf="!selectedSession.currentParticipants">
+                              No participants have signed up yet.
+                          </p>
+                          
+                          <!-- Participant list -->
+                          <ul class="participants-list" *ngIf="selectedSession.currentParticipants">
+                              <li class="participant-item" *ngFor="let i of [1,2,3].slice(0, selectedSession.currentParticipants)">
+                                  <div class="avatar-placeholder"></div>
+                                  <div class="participant-info">
+                                      <div class="participant-name">Student {{i}}</div>
+                                      <div class="participant-email">student{{i}}&#64;example.com</div>
+                                  </div>
+                              </li>
+                          </ul>
+                      </div>
+                  </div>
+                  
+                  <div class="card-actions">
+                      <button *ngIf="selectedSession.status === 'scheduled'" 
+                          class="danger-button" (click)="cancelSession(selectedSession.id)">
+                          Cancel Session
+                      </button>
+                      <button class="secondary-button">
+                          Send Reminder
+                      </button>
+                      <button class="primary-button">
+                          <i class="icon icon-edit"></i> Edit Session
+                      </button>
+                  </div>
+              </div>
+          </div>
+          
+          <!-- Sessions List -->
+          <div class="sessions-list-container">
+              <h4>Upcoming & Recent Sessions</h4>
+              
+              <div class="table-container">
+                  <table class="data-table">
+                      <thead>
+                          <tr>
+                              <th (click)="sortData('title')">Title</th>
+                              <th (click)="sortData('date')">Date</th>
+                              <th>Time</th>
+                              <th>Venue</th>
+                              <th>Participants</th>
+                              <th (click)="sortData('status')">Status</th>
+                              <th>Actions</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          <tr *ngFor="let session of dataSource.data"
+                              [ngClass]="{'highlight-row': selectedSession?.id === session.id}"
+                              (click)="viewSessionDetails(session)">
+                              <td>{{session.title}}</td>
+                              <td>{{session.date | date:'mediumDate'}}</td>
+                              <td>{{session.startTime}} - {{session.endTime}}</td>
+                              <td>{{session.venue}}</td>
+                              <td>{{session.currentParticipants || 0}} / {{session.maxParticipants}}</td>
+                              <td>
+                                  <span class="status-badge" [ngClass]="getStatusClass(session.status || '')">
+                                      {{session.status}}
+                                  </span>
+                              </td>
+                              <td>
+                                  <div class="dropdown">
+                                      <button class="dropdown-toggle">
+                                          <i class="icon icon-more"></i>
+                                      </button>
+                                      <div class="dropdown-menu">
+                                          <a class="dropdown-item" (click)="viewSessionDetails(session); $event.stopPropagation()">
+                                              <i class="icon icon-visibility"></i>
+                                              <span>View Details</span>
+                                          </a>
+                                          <a *ngIf="session.status === 'scheduled'" class="dropdown-item">
+                                              <i class="icon icon-edit"></i>
+                                              <span>Edit Session</span>
+                                          </a>
+                                          <a *ngIf="session.status === 'scheduled'" class="dropdown-item">
+                                              <i class="icon icon-send"></i>
+                                              <span>Send Reminder</span>
+                                          </a>
+                                          <a *ngIf="session.status === 'in-progress'" class="dropdown-item">
+                                              <i class="icon icon-check"></i>
+                                              <span>Mark Attendance</span>
+                                          </a>
+                                          <a *ngIf="session.status === 'scheduled'" class="dropdown-item"
+                                              (click)="cancelSession(session.id); $event.stopPropagation()">
+                                              <i class="icon icon-cancel"></i>
+                                              <span>Cancel Session</span>
+                                          </a>
+                                      </div>
+                                  </div>
+                              </td>
+                          </tr>
+                      </tbody>
+                  </table>
+                  
+                  <!-- No data message -->
+                  <div *ngIf="dataSource.data.length === 0" class="no-data-message">
+                      <i class="icon icon-event-busy"></i>
+                      <p>No sessions found</p>
+                      <button class="primary-button">
+                          Schedule Your First Session
+                      </button>
+                  </div>
+                  
+                  <!-- Pagination -->
+                  <div class="pagination">
+                      <div class="pagination-info">
+                          Showing {{(currentPage - 1) * pageSize + 1}} to 
+                          {{currentPage * pageSize > totalItems ? totalItems : currentPage * pageSize}}
+                          of {{totalItems}} items
+                      </div>
+                      <div class="pagination-controls">
+                          <button class="pagination-button" [disabled]="currentPage === 1" (click)="goToPage(1)">First</button>
+                          <button class="pagination-button" [disabled]="currentPage === 1" (click)="goToPage(currentPage - 1)">Previous</button>
+                          <div class="pagination-pages">
+                              <button *ngFor="let page of getPageArray()" 
+                                  class="pagination-page" 
+                                  [class.active]="page === currentPage"
+                                  (click)="goToPage(page)">
+                                  {{page}}
+                              </button>
+                          </div>
+                          <button class="pagination-button" [disabled]="currentPage === totalPages" (click)="goToPage(currentPage + 1)">Next</button>
+                          <button class="pagination-button" [disabled]="currentPage === totalPages" (click)="goToPage(totalPages)">Last</button>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  <!-- Weekly Schedule Tab -->
+  <div *ngIf="activeTab === 'schedule'" class="tab-content schedule-tab">
+      <h3>Weekly Schedule</h3>
+      
+      <div class="timetable-container">
+          <table class="timetable">
+              <thead>
+                  <tr>
+                      <th class="time-header">Time</th>
+                      <th *ngFor="let day of weekDays">{{day}}</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <tr *ngFor="let timeSlot of timeSlots">
+                      <td class="time-cell">{{timeSlot}}</td>
+                      <td *ngFor="let day of weekDays" 
+                          [ngClass]="{
+                              'available': getSlotStatus(day, timeSlot)?.isAvailable,
+                              'session-scheduled': getSlotStatus(day, timeSlot)?.sessionTitle
+                          }"
+                          (click)="handleTimeSlotClick(day, timeSlot)">
+                          <div *ngIf="getSlotStatus(day, timeSlot)?.sessionTitle" class="session-info">
+                              {{getSlotStatus(day, timeSlot)?.sessionTitle}}
+                          </div>
+                          <div *ngIf="getSlotStatus(day, timeSlot)?.isAvailable && !getSlotStatus(day, timeSlot)?.sessionTitle" 
+                              class="available-indicator">
+                              Available
+                          </div>
+                      </td>
+                  </tr>
+              </tbody>
+          </table>
+      </div>
+      
+      <div class="legend">
+          <div class="legend-item">
+              <div class="legend-color available"></div>
+              <span>Available</span>
+          </div>
+          <div class="legend-item">
+              <div class="legend-color session-scheduled"></div>
+              <span>Session Scheduled</span>
+          </div>
+          <div class="legend-item">
+              <div class="legend-color unavailable"></div>
+              <span>Unavailable</span>
+          </div>
+      </div>
+  </div>
+  
+  <!-- Set Availability Tab -->
+  <div *ngIf="activeTab === 'availability'" class="tab-content availability-tab">
+      <h3>Set Your Availability</h3>
+      
+      <div class="content-container">
+          <div class="availability-form-container">
+              <div class="card">
+                  <div class="card-header">
+                      <h4 class="card-title">Add Availability Slot</h4>
+                  </div>
+                  <div class="card-content">
+                      <form [formGroup]="availabilityForm" (ngSubmit)="setAvailability()">
+                          <div class="form-row">
+                              <div class="form-field">
+                                  <label for="day">Day</label>
+                                  <select id="day" formControlName="day">
+                                      <option value="">Select day</option>
+                                      <option *ngFor="let day of weekDays" [value]="day">
+                                          {{day}}
+                                      </option>
+                                  </select>
+                                  <div *ngIf="availabilityForm.get('day')?.invalid && availabilityForm.get('day')?.touched" class="error-message">
+                                      Day is required
+                                  </div>
+                              </div>
+                          </div>
+                          
+                          <div class="form-row two-col">
+                              <div class="form-field">
+                                  <label for="avail-startTime">Start Time</label>
+                                  <input id="avail-startTime" type="time" formControlName="startTime">
+                                  <div *ngIf="availabilityForm.get('startTime')?.invalid && availabilityForm.get('startTime')?.touched" class="error-message">
+                                      Start time is required
+                                  </div>
+                              </div>
+                              
+                              <div class="form-field">
+                                  <label for="avail-endTime">End Time</label>
+                                  <input id="avail-endTime" type="time" formControlName="endTime">
+                                  <div *ngIf="availabilityForm.get('endTime')?.invalid && availabilityForm.get('endTime')?.touched" class="error-message">
+                                      End time is required
+                                  </div>
+                              </div>
+                          </div>
+                          
+                          <div *ngIf="!checkTimeValidity() && availabilityForm.get('startTime')?.value && availabilityForm.get('endTime')?.value" 
+                              class="error-message">
+                              End time must be after start time
+                          </div>
+                          
+                          <div class="form-actions">
+                              <button type="button" class="secondary-button" (click)="availabilityForm.reset()">
+                                  Cancel
+                              </button>
+                              <button type="submit" class="primary-button" 
+                                  [disabled]="availabilityForm.invalid || !checkTimeValidity()">
+                                  Add Availability
+                              </button>
+                          </div>
+                      </form>
+                  </div>
+              </div>
+          </div>
+          
+          <!-- Availability list could be added here -->
+          <div class="availability-list-container">
+              <h4>Current Availability</h4>
+              <div class="table-container">
+                  <table class="data-table">
+                      <thead>
+                          <tr>
+                              <th>Day</th>
+                              <th>Start Time</th>
+                              <th>End Time</th>
+                              <th>Actions</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          <!-- This would be populated from your availability data -->
+                          <tr *ngFor="let day of weekDays">
+                              <td colspan="4" *ngIf="!getDayAvailability(day).length" class="no-data-cell">
+                                  No availability set for {{day}}
+                              </td>
+                              <ng-container *ngFor="let slot of getDayAvailability(day); let i = index">
+                                  <tr *ngIf="i === 0">
+                                      <td [attr.rowspan]="getDayAvailability(day).length">{{day}}</td>
+                                      <td>{{slot.startTime}}</td>
+                                      <td>{{slot.endTime}}</td>
+                                      <td>
+                                          <button class="icon-button delete-button" (click)="removeAvailability(slot.id)">
+                                              <i class="icon icon-delete"></i>
+                                          </button>
+                                      </td>
+                                  </tr>
+                                  <tr *ngIf="i > 0">
+                                      <td>{{slot.startTime}}</td>
+                                      <td>{{slot.endTime}}</td>
+                                      <td>
+                                          <button class="icon-button delete-button" (click)="removeAvailability(slot.id)">
+                                              <i class="icon icon-delete"></i>
+                                          </button>
+                                      </td>
+                                  </tr>
+                              </ng-container>
+                          </tr>
+                      </tbody>
+                  </table>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  <!-- Logout Button -->
+  <div class="logout-container">
+      <button (click)="logout()" class="logout-button">
+          <i class="icon icon-logout"></i>
+          Logout
+      </button>
+  </div>
+</div>

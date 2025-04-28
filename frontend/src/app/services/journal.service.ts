@@ -4,16 +4,18 @@ import { map, Observable } from 'rxjs';
 import { AuthService } from './auth.service';
 
 export interface DailyJournal {
-content: any;
-user_name: any;
   id?: number;
   user_id: number;
-  entry_date: string | null; // Changed to allow null
+  title?: string; // Add the title property
+  content: string;
+  entry_date: string | null;
   mood: string;
   reflections: string;
   gratitude: string;
-  created_at?: string | null; // Changed to allow null
-  updated_at?: string | null; // Changed to allow null
+  created_at?: string | null;
+  updated_at?: string | null;
+  mood_tag?: string;
+  user_name?: string;
 }
 
 @Injectable({

@@ -15,6 +15,8 @@ import { LoginComponent } from './login/login.component';
 import { ProfileComponent } from './profile/profile.component';
 import { PostsComponent } from './posts/posts.component';
 import { MoodComponent } from './mood/mood.component';
+import { StudentmanagementComponent } from './counsellor/studentmanagement/studentmanagement.component';
+import { SessionmanagementComponent } from './counsellor/sessionmanagement/sessionmanagement.component';
 
 
 export const routes: Routes = [
@@ -33,6 +35,9 @@ export const routes: Routes = [
     
 
     { path: 'counsellor', component: CounselorDashComponent },
+    { path: 'counsellor-students', component: StudentmanagementComponent },
+    { path: 'counsellor-sessions', component: SessionmanagementComponent },
+
 
     { path: 'admin', component: AdminComponent },
 

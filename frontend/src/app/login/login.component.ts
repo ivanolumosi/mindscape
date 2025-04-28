@@ -1,4 +1,3 @@
-// Updated login.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
@@ -70,7 +69,7 @@ export class LoginComponent implements OnInit {
   ngOnInit(): void {
     // Check if user is already logged in
     if (this.authService.isLoggedIn()) {
-      this.router.navigate(['/userdash']);
+      this.redirectBasedOnRole(this.authService.getUserRole());
     }
   }
 
@@ -99,10 +98,12 @@ export class LoginComponent implements OnInit {
           // Clear form after successful login
           this.loginForm.reset();
           
+          // Redirect based on user role
+          const userRole = response.user.role;
+          
           // Delay navigation to show success message
           setTimeout(() => {
-            // Direct all regular logins to userdash
-            this.router.navigate(['/userdash']);
+            this.redirectBasedOnRole(userRole);
           }, 1500);
         },
         error => {
@@ -112,6 +113,22 @@ export class LoginComponent implements OnInit {
       );
     } else {
       this.markFormGroupTouched(this.loginForm);
+    }
+  }
+
+  // Redirect users based on their role
+  redirectBasedOnRole(role: string): void {
+    switch (role) {
+      case 'counselor':
+        this.router.navigate(['/counsellor-sessions']);
+        break;
+      case 'admin':
+        this.router.navigate(['/admin']);
+        break;
+      case 'seeker':
+      default:
+        this.router.navigate(['/userdash']);
+        break;
     }
   }
 
